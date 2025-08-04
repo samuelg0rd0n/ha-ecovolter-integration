@@ -1,0 +1,11 @@
+{
+  "domain": "ecovolter",
+  "name": "EcoVolter",
+  "codeowners": ["@samuelg0rd0N"],
+  "icon": "mdi:ev-plug-type2",
+  "config_flow": true,
+  "documentation": "https://github.com/ludeeus/ecovolter",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/ludeeus/ecovolter/issues",
+  "version": "0.1.0"
+}

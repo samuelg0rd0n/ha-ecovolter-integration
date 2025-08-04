@@ -1,0 +1,16 @@
+# Ignore everything
+*
+
+# But not these files...
+!.gitignore
+!README.md
+!LICENSE
+!requirements.txt
+!hacs.json
+!docs/
+!docs/**
+
+# And not the custom_components folder and its contents
+!custom_components/
+!custom_components/**
+custom_components/ecovolter/__pycache__
