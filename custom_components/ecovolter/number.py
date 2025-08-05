@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from homeassistant.components.number import NumberEntity, NumberEntityDescription
 from homeassistant.const import UnitOfElectricCurrent
 
+from .utils import camel_to_snake
 from .const import DOMAIN
 from .entity import IntegrationEcovolterEntity
 
@@ -17,11 +18,12 @@ if TYPE_CHECKING:
     from .coordinator import EcovolterDataUpdateCoordinator
     from .data import IntegrationEcovolterConfigEntry
 
+# Key is used to get the value from the API
 ENTITY_DESCRIPTIONS = (
     NumberEntityDescription(
-        key="target_current",
+        key="targetCurrent",
         name="Target Current",
-        icon="mdi:current-dc",
+        icon="mdi:current-ac",
         native_min_value=6,
         native_max_value=16,
         native_step=1,
@@ -57,23 +59,25 @@ class IntegrationEcovolterNumber(IntegrationEcovolterEntity, NumberEntity):
         super().__init__(coordinator)
         self.entity_description = entity_description
         self._attr_unique_id = (
-            f"{coordinator.config_entry.entry_id}_{entity_description.key}"
+            f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
         )
         self._attr_name = entity_description.name
 
     @property
     def suggested_object_id(self) -> str:
         """This is used to generate the entity_id."""
-        return f"{DOMAIN}_{self.entity_description.key}"
+        return f"{DOMAIN}_{camel_to_snake(self.entity_description.key)}"
 
     @property
     def native_value(self) -> float:
         """Return the current value."""
-        return self.coordinator.data.get("settings", {}).get("targetCurrent", 6)
+        return self.coordinator.data.get("settings", {}).get(
+            self.entity_description.key, 6
+        )
 
     async def async_set_native_value(self, value: float) -> None:
         """Set a new value."""
         await self.coordinator.config_entry.runtime_data.client.async_set_settings(
-            {"targetCurrent": int(value)}
+            {self.entity_description.key: int(value)}
         )
         await self.coordinator.async_request_refresh()

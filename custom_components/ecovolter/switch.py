@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 
+from .utils import camel_to_snake
 from .const import DOMAIN
 from .entity import IntegrationEcovolterEntity
 
@@ -16,16 +17,17 @@ if TYPE_CHECKING:
     from .coordinator import EcovolterDataUpdateCoordinator
     from .data import IntegrationEcovolterConfigEntry
 
+# Key is used to get the value from the API
 ENTITY_DESCRIPTIONS = (
     SwitchEntityDescription(
-        key="is_three_phase_mode_enable",
+        key="isThreePhaseModeEnable",
         name="3-Phase Mode Enabled",
         icon="mdi:format-quote-close",
     ),
     SwitchEntityDescription(
-        key="is_charging_enable",
+        key="isChargingEnable",
         name="Charging Enabled",
-        icon="mdi:leaf",
+        icon="mdi:ev-station",
     ),
 )
 
@@ -57,14 +59,14 @@ class IntegrationEcovolterSwitch(IntegrationEcovolterEntity, SwitchEntity):
         super().__init__(coordinator)
         self.entity_description = entity_description
         self._attr_unique_id = (
-            f"{coordinator.config_entry.entry_id}_{entity_description.key}"
+            f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
         )
         self._attr_name = entity_description.name
 
     @property
     def suggested_object_id(self) -> str:
         """This is used to generate the entity_id."""
-        return f"{DOMAIN}_{self.entity_description.key}"
+        return f"{DOMAIN}_{camel_to_snake(self.entity_description.key)}"
 
     @property
     def is_on(self) -> bool:

@@ -13,15 +13,15 @@ from homeassistant.const import Platform
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.loader import async_get_loaded_integration
 
-from .api import IntegrationEcovolterApiClient
+from .api import EcovolterApiClient
 from .const import DOMAIN, LOGGER, SECRET_KEY, SERIAL_NUMBER
 from .coordinator import EcovolterDataUpdateCoordinator
-from .data import IntegrationEcovolterData
+from .data import EcovolterData
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
 
-    from .data import IntegrationEcovolterConfigEntry
+    from .data import EcovolterConfigEntry
 
 PLATFORMS: list[Platform] = [Platform.SWITCH, Platform.NUMBER, Platform.BINARY_SENSOR]
 
@@ -29,7 +29,7 @@ PLATFORMS: list[Platform] = [Platform.SWITCH, Platform.NUMBER, Platform.BINARY_S
 # https://developers.home-assistant.io/docs/config_entries_index/#setting-up-an-entry
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: IntegrationEcovolterConfigEntry,
+    entry: EcovolterConfigEntry,
 ) -> bool:
     """Set up this integration using UI."""
     coordinator = EcovolterDataUpdateCoordinator(
@@ -38,8 +38,8 @@ async def async_setup_entry(
         name=DOMAIN,
         update_interval=timedelta(seconds=30),
     )
-    entry.runtime_data = IntegrationEcovolterData(
-        client=IntegrationEcovolterApiClient(
+    entry.runtime_data = EcovolterData(
+        client=EcovolterApiClient(
             serial_number=entry.data[SERIAL_NUMBER],
             secret_key=entry.data[SECRET_KEY],
             session=async_get_clientsession(hass),
@@ -59,7 +59,7 @@ async def async_setup_entry(
 
 async def async_unload_entry(
     hass: HomeAssistant,
-    entry: IntegrationEcovolterConfigEntry,
+    entry: EcovolterConfigEntry,
 ) -> bool:
     """Handle removal of an entry."""
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
@@ -67,7 +67,7 @@ async def async_unload_entry(
 
 async def async_reload_entry(
     hass: HomeAssistant,
-    entry: IntegrationEcovolterConfigEntry,
+    entry: EcovolterConfigEntry,
 ) -> None:
     """Reload config entry."""
     await hass.config_entries.async_reload(entry.entry_id)

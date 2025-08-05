@@ -9,17 +9,17 @@ if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
     from homeassistant.loader import Integration
 
-    from .api import IntegrationEcovolterApiClient
+    from .api import EcovolterApiClient
     from .coordinator import EcovolterDataUpdateCoordinator
 
 
-type IntegrationEcovolterConfigEntry = ConfigEntry[IntegrationEcovolterData]
+type EcovolterConfigEntry = ConfigEntry[EcovolterData]
 
 
 @dataclass
-class IntegrationEcovolterData:
+class EcovolterData:
     """Data for the Ecovolter integration."""
 
-    client: IntegrationEcovolterApiClient
+    client: EcovolterApiClient
     coordinator: EcovolterDataUpdateCoordinator
     integration: Integration

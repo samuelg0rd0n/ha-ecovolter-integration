@@ -8,12 +8,12 @@ from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import (
-    IntegrationEcovolterApiClientAuthenticationError,
-    IntegrationEcovolterApiClientError,
+    EcovolterApiClientAuthenticationError,
+    EcovolterApiClientError,
 )
 
 if TYPE_CHECKING:
-    from .data import IntegrationEcovolterConfigEntry
+    from .data import EcovolterConfigEntry
 
 
 class DataType(TypedDict):
@@ -27,7 +27,7 @@ class DataType(TypedDict):
 class EcovolterDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
-    config_entry: IntegrationEcovolterConfigEntry
+    config_entry: EcovolterConfigEntry
 
     async def _async_update_data(self) -> DataType:
         """Update data via library."""
@@ -38,9 +38,9 @@ class EcovolterDataUpdateCoordinator(DataUpdateCoordinator):
             settings = (
                 await self.config_entry.runtime_data.client.async_get_settings()
             )  # /api/v1/charger/settings
-        except IntegrationEcovolterApiClientAuthenticationError as exception:
+        except EcovolterApiClientAuthenticationError as exception:
             raise ConfigEntryAuthFailed(exception) from exception
-        except IntegrationEcovolterApiClientError as exception:
+        except EcovolterApiClientError as exception:
             raise UpdateFailed(exception) from exception
         else:
             return {

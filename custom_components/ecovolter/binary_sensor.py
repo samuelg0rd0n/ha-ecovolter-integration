@@ -10,6 +10,7 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 
+from .utils import camel_to_snake
 from .const import DOMAIN
 from .entity import IntegrationEcovolterEntity
 
@@ -20,18 +21,24 @@ if TYPE_CHECKING:
     from .coordinator import EcovolterDataUpdateCoordinator
     from .data import IntegrationEcovolterConfigEntry
 
+# Key is used to get the value from the API
 ENTITY_DESCRIPTIONS = (
     BinarySensorEntityDescription(
-        key="is_charging",
+        key="isCharging",
         name="Is Charging?",
-        icon="mdi:battery-charging-60",
+        icon="mdi:ev-station",
         device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
     ),
     BinarySensorEntityDescription(
-        key="is_vehicle_connected",
+        key="isVehicleConnected",
         name="Is Vehicle Connected?",
         icon="mdi:ev-plug-type2",
         device_class=BinarySensorDeviceClass.PLUG,
+    ),
+    BinarySensorEntityDescription(
+        key="isThreePhaseModeEnable",
+        name="3-Phase Mode Enabled",
+        icon="mdi:flash",
     ),
 )
 
@@ -63,14 +70,14 @@ class IntegrationEcovolterBinarySensor(IntegrationEcovolterEntity, BinarySensorE
         super().__init__(coordinator)
         self.entity_description = entity_description
         self._attr_unique_id = (
-            f"v2{coordinator.config_entry.entry_id}_{entity_description.key}"
+            f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
         )
         self._attr_name = entity_description.name
 
     @property
     def suggested_object_id(self) -> str:
         """This is used to generate the entity_id."""
-        return f"{DOMAIN}_{self.entity_description.key}"
+        return f"{DOMAIN}_{camel_to_snake(self.entity_description.key)}"
 
     @property
     def is_on(self) -> bool:

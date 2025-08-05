@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import asyncio.timeout
+import asyncio
 import hashlib
 import hmac
 import json
@@ -13,17 +13,17 @@ from typing import Any
 import aiohttp
 
 
-class IntegrationEcovolterApiClientError(Exception):
+class EcovolterApiClientError(Exception):
     """Exception to indicate a general API error."""
 
-class IntegrationEcovolterApiClientCommunicationError(
-    IntegrationEcovolterApiClientError,
+class EcovolterApiClientCommunicationError(
+    EcovolterApiClientError,
 ):
     """Exception to indicate a communication error."""
 
 
-class IntegrationEcovolterApiClientAuthenticationError(
-    IntegrationEcovolterApiClientError,
+class EcovolterApiClientAuthenticationError(
+    EcovolterApiClientError,
 ):
     """Exception to indicate an authentication error."""
 
@@ -31,14 +31,14 @@ class IntegrationEcovolterApiClientAuthenticationError(
 def _verify_response_or_raise(response: aiohttp.ClientResponse) -> None:
     """Verify that the response is valid."""
     if response.status in (401, 403):
-        msg = "Invalid credentials"
-        raise IntegrationEcovolterApiClientAuthenticationError(
+        msg = "Authentication failed. Incorrect secret key."
+        raise EcovolterApiClientAuthenticationError(
             msg,
         )
     response.raise_for_status()
 
 
-class IntegrationEcovolterApiClient:
+class EcovolterApiClient:
     """Sample API Client."""
 
     def __init__(
@@ -95,28 +95,35 @@ class IntegrationEcovolterApiClient:
         }
 
         try:
-            async with asyncio.timeout(10):
-                response = await self._session.request(
+            response = await asyncio.wait_for(
+                self._session.request(
                     method=method,
                     url=url,
                     headers=headers,
                     json=data,
-                )
-                _verify_response_or_raise(response)
-                return await response.json()
+                ),
+                timeout=10.0
+            )
+            _verify_response_or_raise(response)
+            return await response.json()
 
         except TimeoutError as exception:
             msg = f"Timeout error fetching information - {exception}"
-            raise IntegrationEcovolterApiClientCommunicationError(
+            raise EcovolterApiClientCommunicationError(
                 msg,
             ) from exception
         except (aiohttp.ClientError, socket.gaierror) as exception:
             msg = f"Error fetching information - {exception}"
-            raise IntegrationEcovolterApiClientCommunicationError(
+            raise EcovolterApiClientCommunicationError(
+                msg,
+            ) from exception
+        except EcovolterApiClientAuthenticationError as exception:
+            msg = f"Authentication failed. Incorrect secret key. - {exception}"
+            raise EcovolterApiClientAuthenticationError(
                 msg,
             ) from exception
         except Exception as exception:  # pylint: disable=broad-except
             msg = f"Something really wrong happened! - {exception}"
-            raise IntegrationEcovolterApiClientError(
+            raise EcovolterApiClientError(
                 msg,
             ) from exception
