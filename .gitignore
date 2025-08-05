@@ -5,7 +5,6 @@
 !.gitignore
 !README.md
 !LICENSE
-!requirements.txt
 !hacs.json
 !docs/
 !docs/**
