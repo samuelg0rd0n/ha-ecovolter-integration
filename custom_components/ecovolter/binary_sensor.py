@@ -82,6 +82,6 @@ class IntegrationEcovolterBinarySensor(IntegrationEcovolterEntity, BinarySensorE
     @property
     def is_on(self) -> bool:
         """Return true if the binary_sensor is on."""
-        return self.coordinator.data.get("settings", {}).get(
+        return self.coordinator.data.get("status", {}).get(
             self.entity_description.key, False
         )

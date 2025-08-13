@@ -72,7 +72,7 @@ class IntegrationEcovolterSwitch(IntegrationEcovolterEntity, SwitchEntity):
     def is_on(self) -> bool:
         """Return true if the switch is on."""
         return self.coordinator.data.get("settings", {}).get(
-            self.entity_description.key, ""
+            self.entity_description.key, False
         )
 
     async def async_turn_on(self, **_: Any) -> None:
