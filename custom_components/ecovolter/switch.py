@@ -22,7 +22,7 @@ ENTITY_DESCRIPTIONS = (
     SwitchEntityDescription(
         key="isThreePhaseModeEnable",
         name="3-Phase Mode Enabled",
-        icon="mdi:format-quote-close",
+        icon="mdi:numeric-3-circle",
     ),
     SwitchEntityDescription(
         key="isChargingEnable",

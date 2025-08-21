@@ -38,7 +38,7 @@ ENTITY_DESCRIPTIONS = (
     BinarySensorEntityDescription(
         key="isThreePhaseModeEnable",
         name="3-Phase Mode Enabled",
-        icon="mdi:flash",
+        icon="mdi:numeric-3-circle",
     ),
 )
 

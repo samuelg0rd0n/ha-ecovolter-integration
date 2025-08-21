@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from homeassistant.components.number import NumberEntity, NumberEntityDescription
-from homeassistant.const import UnitOfElectricCurrent
 
 from .utils import camel_to_snake
 from .const import DOMAIN
@@ -27,7 +26,7 @@ ENTITY_DESCRIPTIONS = (
         native_min_value=6,
         native_max_value=16,
         native_step=1,
-        unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+        native_unit_of_measurement="A",
     ),
 )
 
