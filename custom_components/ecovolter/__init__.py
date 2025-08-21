@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 
     from .data import EcovolterConfigEntry
 
-PLATFORMS: list[Platform] = [Platform.SWITCH, Platform.NUMBER, Platform.BINARY_SENSOR]
+PLATFORMS: list[Platform] = [Platform.SWITCH, Platform.NUMBER, Platform.BINARY_SENSOR, Platform.SENSOR]
 
 
 # https://developers.home-assistant.io/docs/config_entries_index/#setting-up-an-entry
