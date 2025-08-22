@@ -1,6 +1,8 @@
 # EcoVolter Home Assistant Integration
 
-A Home Assistant integration for EcoVolter II EV chargers that enables you to locally control basic charging functions such as turning charging on and off, setting target current, and monitoring whether your vehicle is plugged in or actively charging. I originally created this integration for my own use, but thought others might find it helpful as well. Enjoy! :-)
+A Home Assistant integration for [EcoVolter II EV chargers](https://www.ecovolter.com/) that enables you to locally control basic charging functions such as turning charging on and off, setting target current, and monitoring whether your vehicle is plugged in or actively charging. It uses their [API](https://asnplus.github.io/revc-charger-local-api-documentation/).
+
+I originally created this integration for my own use, but thought others might find it helpful as well. Enjoy! :-)
 
 ## Installation
 
@@ -51,7 +53,8 @@ A Home Assistant integration for EcoVolter II EV chargers that enables you to lo
 
 - Home Assistant 2023.8.0 or newer
 - EcoVolter II EV charger with network connectivity
-- **Only EcoVolter II (2nd version) with local control is supported by this integration**
+
+**Only EcoVolter II (2nd version) with local control is supported by this integration.** If you have 1st version with cloud API and using iXmanager app, you can use [this integration](https://github.com/kubacizek/home-assistant-ixmanager).
 
 ## Troubleshooting
 
