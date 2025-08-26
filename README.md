@@ -4,6 +4,8 @@ A Home Assistant integration for [EcoVolter II EV chargers](https://www.ecovolte
 
 **Only EcoVolter II (2nd generation) with local control is supported by this integration.** If you have 1st generation with cloud API using iXmanager app, you can use [iXmanager Integration](https://github.com/kubacizek/home-assistant-ixmanager).
 
+Wi-Fi connection is required. If your EcoVolter doesn't have wi-fi enabled you can pay to unlock it.
+
 I originally created this integration for my own use, but thought others might find it helpful as well. Enjoy! :-)
 
 ## Installation
