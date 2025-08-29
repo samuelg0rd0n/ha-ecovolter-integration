@@ -75,6 +75,9 @@ class IntegrationEcovolterSensor(IntegrationEcovolterEntity, SensorEntity):
     def native_value(self):
         """Return the native value of the sensor."""
         value = self.coordinator.data.get("status", {}).get(self.entity_description.key)
+
+        if self.entity_description.key == "actualPower":
+            value *= 1000
         
         # Handle different data types and conversions
         if value is None:
