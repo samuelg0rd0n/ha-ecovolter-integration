@@ -35,11 +35,6 @@ ENTITY_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
         icon="mdi:ev-plug-type2",
         device_class=BinarySensorDeviceClass.PLUG,
     ),
-    BinarySensorEntityDescription(
-        key="isThreePhaseModeEnable",
-        name="3-Phase Mode Enabled",
-        icon="mdi:numeric-3-circle",
-    ),
 )
 
 

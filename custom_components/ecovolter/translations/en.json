@@ -6,7 +6,8 @@
         "data": {
           "serial_number": "Charger Serial Number",
           "secret_key": "Secret Key",
-          "base_uri": "Base URI"
+          "base_uri": "Base URI",
+          "update_interval": "Update interval"
         }
       }
     },
