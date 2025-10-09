@@ -15,7 +15,7 @@ from .api import (
     EcovolterApiClientError,
 )
 
-from .const import DOMAIN, SECRET_KEY, SERIAL_NUMBER, LOGGER
+from .const import DOMAIN, SECRET_KEY, SERIAL_NUMBER, BASE_URI, LOGGER
 
 
 class EcovolterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
@@ -32,8 +32,9 @@ class EcovolterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             try:
                 await self._test_credentials(
-                    secret_key=user_input[SECRET_KEY],
-                    serial_number=user_input[SERIAL_NUMBER],
+                    secret_key=user_input[SECRET_KEY].strip().lower(),
+                    serial_number=user_input[SERIAL_NUMBER].strip().lower(),
+                    base_uri=user_input[BASE_URI],
                 )
             except EcovolterApiClientAuthenticationError as exception:
                 LOGGER.warning(exception)
@@ -72,16 +73,22 @@ class EcovolterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                             type=selector.TextSelectorType.TEXT,
                         ),
                     ),
+                    vol.Optional(BASE_URI): selector.TextSelector(
+                        selector.TextSelectorConfig(
+                            type=selector.TextSelectorType.TEXT,
+                        ),
+                    ),
                 },
             ),
             errors=_errors,
         )
 
-    async def _test_credentials(self, serial_number: str, secret_key: str) -> None:
+    async def _test_credentials(self, serial_number: str, secret_key: str, base_uri: str | None = None) -> None:
         """Validate credentials."""
         client = EcovolterApiClient(
            serial_number=serial_number,
            secret_key=secret_key,
+           base_uri=base_uri,
            session=async_create_clientsession(self.hass),
         )
         await client.async_get_status()

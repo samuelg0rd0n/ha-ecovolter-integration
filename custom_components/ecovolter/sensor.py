@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
     from .coordinator import EcovolterDataUpdateCoordinator
-    from .data import IntegrationEcovolterConfigEntry
+    from .data import EcovolterConfigEntry
 
 # Key is used to get the value from the API
 ENTITY_DESCRIPTIONS = (
@@ -37,7 +37,7 @@ ENTITY_DESCRIPTIONS = (
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: IntegrationEcovolterConfigEntry,
+    entry: EcovolterConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the sensor platform."""
@@ -64,7 +64,6 @@ class IntegrationEcovolterSensor(IntegrationEcovolterEntity, SensorEntity):
         self._attr_unique_id = (
             f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
         )
-        self._attr_name = entity_description.name
 
     @property
     def suggested_object_id(self) -> str:
@@ -72,19 +71,20 @@ class IntegrationEcovolterSensor(IntegrationEcovolterEntity, SensorEntity):
         return f"{DOMAIN}_{camel_to_snake(self.entity_description.key)}"
 
     @property
-    def native_value(self):
+    def native_value(self) -> float | None:
         """Return the native value of the sensor."""
-        value = self.coordinator.data.get("status", {}).get(self.entity_description.key)
+        status = self.coordinator.data.get("status") or {}
+        raw = status.get(self.entity_description.key)
 
+        if raw is None:
+            return None
+
+        try:
+            value = float(raw)
+        except (ValueError, TypeError):
+            return None
+        
         if self.entity_description.key == "actualPower":
             value *= 1000
-        
-        # Handle different data types and conversions
-        if value is None:
-            return None
-            
-        # Convert to float for numeric sensors
-        try:
-            return float(value)
-        except (ValueError, TypeError):
-            return value
+
+        return value

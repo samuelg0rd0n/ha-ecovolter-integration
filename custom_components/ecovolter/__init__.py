@@ -14,7 +14,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.loader import async_get_loaded_integration
 
 from .api import EcovolterApiClient
-from .const import DOMAIN, LOGGER, SECRET_KEY, SERIAL_NUMBER
+from .const import DOMAIN, LOGGER, SECRET_KEY, SERIAL_NUMBER, BASE_URI
 from .coordinator import EcovolterDataUpdateCoordinator
 from .data import EcovolterData
 
@@ -42,6 +42,7 @@ async def async_setup_entry(
         client=EcovolterApiClient(
             serial_number=entry.data[SERIAL_NUMBER],
             secret_key=entry.data[SECRET_KEY],
+            base_uri=entry.data[BASE_URI],
             session=async_get_clientsession(hass),
         ),
         integration=async_get_loaded_integration(hass, entry.domain),

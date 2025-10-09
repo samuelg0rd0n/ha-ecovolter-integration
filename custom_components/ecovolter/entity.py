@@ -26,3 +26,4 @@ class IntegrationEcovolterEntity(CoordinatorEntity[EcovolterDataUpdateCoordinato
                 ),
             },
         )
+        self._attr_has_entity_name = True

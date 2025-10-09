@@ -19,10 +19,10 @@ if TYPE_CHECKING:
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
     from .coordinator import EcovolterDataUpdateCoordinator
-    from .data import IntegrationEcovolterConfigEntry
+    from .data import EcovolterConfigEntry
 
 # Key is used to get the value from the API
-ENTITY_DESCRIPTIONS = (
+ENTITY_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
     BinarySensorEntityDescription(
         key="isCharging",
         name="Is Charging?",
@@ -45,7 +45,7 @@ ENTITY_DESCRIPTIONS = (
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: IntegrationEcovolterConfigEntry,
+    entry: EcovolterConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the binary_sensor platform."""
@@ -72,7 +72,6 @@ class IntegrationEcovolterBinarySensor(IntegrationEcovolterEntity, BinarySensorE
         self._attr_unique_id = (
             f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
         )
-        self._attr_name = entity_description.name
 
     @property
     def suggested_object_id(self) -> str:

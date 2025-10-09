@@ -15,10 +15,10 @@ if TYPE_CHECKING:
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
     from .coordinator import EcovolterDataUpdateCoordinator
-    from .data import IntegrationEcovolterConfigEntry
+    from .data import EcovolterConfigEntry
 
 # Key is used to get the value from the API
-ENTITY_DESCRIPTIONS = (
+ENTITY_DESCRIPTIONS: tuple[NumberEntityDescription, ...]  = (
     NumberEntityDescription(
         key="targetCurrent",
         name="Target Current",
@@ -33,7 +33,7 @@ ENTITY_DESCRIPTIONS = (
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: IntegrationEcovolterConfigEntry,
+    entry: EcovolterConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the number platform."""
@@ -60,7 +60,6 @@ class IntegrationEcovolterNumber(IntegrationEcovolterEntity, NumberEntity):
         self._attr_unique_id = (
             f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
         )
-        self._attr_name = entity_description.name
 
     @property
     def suggested_object_id(self) -> str:
@@ -68,11 +67,12 @@ class IntegrationEcovolterNumber(IntegrationEcovolterEntity, NumberEntity):
         return f"{DOMAIN}_{camel_to_snake(self.entity_description.key)}"
 
     @property
-    def native_value(self) -> float:
+    def native_value(self) -> float | None:
         """Return the current value."""
-        return self.coordinator.data.get("settings", {}).get(
-            self.entity_description.key, 6
-        )
+        value = self.coordinator.data.get("settings", {}).get(self.entity_description.key)
+        if value is None:
+            return None
+        return float(value)
 
     async def async_set_native_value(self, value: float) -> None:
         """Set a new value."""

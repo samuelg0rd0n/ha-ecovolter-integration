@@ -29,7 +29,7 @@ class EcovolterDataUpdateCoordinator(DataUpdateCoordinator):
 
     config_entry: EcovolterConfigEntry
 
-    async def _async_update_data(self) -> DataType:
+    async def _async_update_data(self) -> dict[str, Any]:
         """Update data via library."""
         try:
             status = (
