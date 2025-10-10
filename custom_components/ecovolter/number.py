@@ -7,7 +7,10 @@ from typing import TYPE_CHECKING
 from homeassistant.components.number import NumberEntity, NumberEntityDescription
 
 from .utils import camel_to_snake
-from .const import DOMAIN
+from .const import (
+    DOMAIN,
+    KEY_SETTINGS
+)
 from .entity import IntegrationEcovolterEntity
 
 if TYPE_CHECKING:
@@ -69,7 +72,7 @@ class IntegrationEcovolterNumber(IntegrationEcovolterEntity, NumberEntity):
     @property
     def native_value(self) -> float | None:
         """Return the current value."""
-        value = self.coordinator.data.get("settings", {}).get(self.entity_description.key)
+        value = self.coordinator.data.get(KEY_SETTINGS, {}).get(self.entity_description.key)
         if value is None:
             return None
         return float(value)

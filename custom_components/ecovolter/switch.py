@@ -7,7 +7,10 @@ from typing import TYPE_CHECKING, Any
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 
 from .utils import camel_to_snake
-from .const import DOMAIN
+from .const import (
+    DOMAIN,
+    KEY_SETTINGS,
+)
 from .entity import IntegrationEcovolterEntity
 
 if TYPE_CHECKING:
@@ -70,7 +73,7 @@ class IntegrationEcovolterSwitch(IntegrationEcovolterEntity, SwitchEntity):
     @property
     def is_on(self) -> bool:
         """Return true if the switch is on."""
-        return self.coordinator.data.get("settings", {}).get(
+        return self.coordinator.data.get(KEY_SETTINGS, {}).get(
             self.entity_description.key, False
         )
 

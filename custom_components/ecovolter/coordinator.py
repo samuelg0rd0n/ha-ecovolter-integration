@@ -12,6 +12,11 @@ from .api import (
     EcovolterApiClientError,
 )
 
+from .const import (
+    KEY_STATUS,
+    KEY_SETTINGS,
+)
+
 if TYPE_CHECKING:
     from .data import EcovolterConfigEntry
 
@@ -24,12 +29,12 @@ class DataType(TypedDict):
 
 
 # https://developers.home-assistant.io/docs/integration_fetching_data#coordinated-single-api-poll-for-data-for-all-entities
-class EcovolterDataUpdateCoordinator(DataUpdateCoordinator):
+class EcovolterDataUpdateCoordinator(DataUpdateCoordinator[DataType]):
     """Class to manage fetching data from the API."""
 
     config_entry: EcovolterConfigEntry
 
-    async def _async_update_data(self) -> dict[str, Any]:
+    async def _async_update_data(self) -> DataType:
         """Update data via library."""
         try:
             status = (
@@ -43,7 +48,8 @@ class EcovolterDataUpdateCoordinator(DataUpdateCoordinator):
         except EcovolterApiClientError as exception:
             raise UpdateFailed(exception) from exception
         else:
-            return {
-                "status": status,
-                "settings": settings,
+            data: DataType = {
+                KEY_STATUS: status,
+                KEY_SETTINGS: settings,
             }
+            return data

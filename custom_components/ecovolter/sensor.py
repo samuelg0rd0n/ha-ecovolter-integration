@@ -12,7 +12,10 @@ from homeassistant.components.sensor import (
 )
 
 from .utils import camel_to_snake
-from .const import DOMAIN
+from .const import (
+    DOMAIN,
+    KEY_STATUS,
+)
 from .entity import IntegrationEcovolterEntity
 
 if TYPE_CHECKING:
@@ -73,7 +76,7 @@ class IntegrationEcovolterSensor(IntegrationEcovolterEntity, SensorEntity):
     @property
     def native_value(self) -> float | None:
         """Return the native value of the sensor."""
-        status = self.coordinator.data.get("status") or {}
+        status = self.coordinator.data.get(KEY_STATUS) or {}
         raw = status.get(self.entity_description.key)
 
         if raw is None:

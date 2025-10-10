@@ -11,7 +11,10 @@ from homeassistant.components.binary_sensor import (
 )
 
 from .utils import camel_to_snake
-from .const import DOMAIN
+from .const import (
+    DOMAIN,
+    KEY_STATUS,
+)
 from .entity import IntegrationEcovolterEntity
 
 if TYPE_CHECKING:
@@ -76,6 +79,6 @@ class IntegrationEcovolterBinarySensor(IntegrationEcovolterEntity, BinarySensorE
     @property
     def is_on(self) -> bool:
         """Return true if the binary_sensor is on."""
-        return self.coordinator.data.get("status", {}).get(
+        return self.coordinator.data.get(KEY_STATUS, {}).get(
             self.entity_description.key, False
         )
