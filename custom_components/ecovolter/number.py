@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 ENTITY_DESCRIPTIONS: tuple[NumberEntityDescription, ...]  = (
     NumberEntityDescription(
         key="targetCurrent",
-        name="Target Current",
+        translation_key="target_current",
         icon="mdi:current-ac",
         native_min_value=6,
         native_max_value=16,

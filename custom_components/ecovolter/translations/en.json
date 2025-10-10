@@ -2,12 +2,17 @@
   "config": {
     "step": {
       "user": {
+        "title": "Add EcoVolter Charger",
         "description": "Charger Serial Number can be found on the charger itself or in EV-Manager (iOS/Android app). Secret Key is by default the same value as Charger Serial Number. If you need help with the configuration have a look here: https://github.com/samuelg0rd0n/ha-ecovolter-integration",
         "data": {
           "serial_number": "Charger Serial Number",
           "secret_key": "Secret Key",
-          "base_uri": "Base URI",
+          "base_uri": "EcoVolter URL",
           "update_interval": "Update interval"
+        },
+        "data_description": {
+          "base_uri": "Optional: use if your network doesn’t support mDNS (.local).",
+          "update_interval": "How often Home Assistant polls the charger (in seconds)."
         }
       }
     },
@@ -18,6 +23,34 @@
     },
     "abort": {
       "already_configured": "This entry is already configured."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "actual_power": {
+        "name": "Actual Power"
+      }
+    },
+    "switch": {
+      "three_phase_mode_enabled": {
+        "name": "3-Phase Mode Enabled"
+      },
+      "charging_enabled": {
+        "name": "Charging Enabled"
+      }
+    },
+    "number": {
+      "target_current": {
+        "name": "Target Current"
+      }
+    },
+    "binary_sensor": {
+      "is_charging": {
+        "name": "Charging"
+      },
+      "vehicle_connected": {
+        "name": "Vehicle Connected"
+      }
     }
   }
 }

@@ -28,13 +28,13 @@ if TYPE_CHECKING:
 ENTITY_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
     BinarySensorEntityDescription(
         key="isCharging",
-        name="Is Charging?",
+        translation_key="is_charging",
         icon="mdi:ev-station",
         device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
     ),
     BinarySensorEntityDescription(
         key="isVehicleConnected",
-        name="Is Vehicle Connected?",
+        translation_key="vehicle_connected",
         icon="mdi:ev-plug-type2",
         device_class=BinarySensorDeviceClass.PLUG,
     ),

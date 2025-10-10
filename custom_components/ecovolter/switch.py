@@ -24,12 +24,12 @@ if TYPE_CHECKING:
 ENTITY_DESCRIPTIONS: tuple[SwitchEntityDescription, ...] = (
     SwitchEntityDescription(
         key="isThreePhaseModeEnable",
-        name="3-Phase Mode Enabled",
+        translation_key="three_phase_mode_enabled",
         icon="mdi:numeric-3-circle",
     ),
     SwitchEntityDescription(
         key="isChargingEnable",
-        name="Charging Enabled",
+        translation_key="charging_enabled",
         icon="mdi:ev-station",
     ),
 )

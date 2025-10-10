@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 ENTITY_DESCRIPTIONS = (
     SensorEntityDescription(
         key="actualPower",
-        name="Actual Power",
+        translation_key="actual_power",
         icon="mdi:flash",
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
