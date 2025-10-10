@@ -6,7 +6,7 @@ from typing import Final
 LOGGER: Logger = getLogger(__package__)
 
 DOMAIN = "ecovolter"
-ATTRIBUTION = "Data provided by http://jsonplaceholder.typicode.com/"
+ATTRIBUTION = "Data provided by EcoVolter charger"
 
 CONF_SERIAL_NUMBER = "serial_number"
 CONF_SECRET_KEY = "secret_key"
