@@ -73,9 +73,7 @@ class IntegrationEcovolterNumber(IntegrationEcovolterEntity, NumberEntity):
     def native_value(self) -> float | None:
         """Return the current value."""
         value = self.coordinator.data.get(KEY_SETTINGS, {}).get(self.entity_description.key)
-        if value is None:
-            return None
-        return float(value)
+        return None if value is None else float(value)
 
     async def async_set_native_value(self, value: float) -> None:
         """Set a new value."""

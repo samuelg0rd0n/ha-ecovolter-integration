@@ -71,11 +71,10 @@ class IntegrationEcovolterSwitch(IntegrationEcovolterEntity, SwitchEntity):
         return f"{DOMAIN}_{camel_to_snake(self.entity_description.key)}"
 
     @property
-    def is_on(self) -> bool:
+    def is_on(self) -> bool | None:
         """Return true if the switch is on."""
-        return self.coordinator.data.get(KEY_SETTINGS, {}).get(
-            self.entity_description.key, False
-        )
+        val = self.coordinator.data.get(KEY_SETTINGS, {}).get(self.entity_description.key)
+        return None if val is None else bool(val)
 
     async def async_turn_on(self, **_: Any) -> None:
         """Turn on the switch."""

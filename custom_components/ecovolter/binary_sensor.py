@@ -77,8 +77,7 @@ class IntegrationEcovolterBinarySensor(IntegrationEcovolterEntity, BinarySensorE
         return f"{DOMAIN}_{camel_to_snake(self.entity_description.key)}"
 
     @property
-    def is_on(self) -> bool:
+    def is_on(self) -> bool | None:
         """Return true if the binary_sensor is on."""
-        return self.coordinator.data.get(KEY_STATUS, {}).get(
-            self.entity_description.key, False
-        )
+        val = self.coordinator.data.get(KEY_STATUS, {}).get(self.entity_description.key)
+        return None if val is None else bool(val)
