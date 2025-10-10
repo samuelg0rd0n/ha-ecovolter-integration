@@ -2,14 +2,32 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import (
+    TYPE_CHECKING,
+    cast
+)
 
-from homeassistant.components.number import NumberEntity, NumberEntityDescription
+
+from homeassistant.components.number import (
+    NumberEntity,
+    NumberEntityDescription,
+    NumberDeviceClass,
+)
+
+from homeassistant.const import (
+    UnitOfElectricCurrent,
+    UnitOfTime,
+    UnitOfEnergy,
+)
+
+from homeassistant.helpers.entity import EntityCategory
 
 from .utils import camel_to_snake
 from .const import (
-    DOMAIN,
-    KEY_SETTINGS
+    KEY_SETTINGS,
+    MIN_CURRENT,
+    MAX_CURRENT,
+    CURRENCY_MAP,
 )
 from .entity import IntegrationEcovolterEntity
 
@@ -26,13 +44,53 @@ ENTITY_DESCRIPTIONS: tuple[NumberEntityDescription, ...]  = (
         key="targetCurrent",
         translation_key="target_current",
         icon="mdi:current-ac",
-        native_min_value=6,
-        native_max_value=16,
+        native_min_value=MIN_CURRENT,
+        native_max_value=MAX_CURRENT,
         native_step=1,
-        native_unit_of_measurement="A",
+        device_class=NumberDeviceClass.CURRENT,        
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+    ),
+    NumberEntityDescription(
+        key="boostCurrent",
+        translation_key="boost_current",
+        icon="mdi:lightning-bolt",
+        native_min_value=MIN_CURRENT,
+        native_max_value=MAX_CURRENT,
+        native_step=1,
+        device_class=NumberDeviceClass.CURRENT,        
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+    ),
+    NumberEntityDescription(
+        key="maxCurrent",
+        translation_key="max_current",
+        icon="mdi:lightning-bolt-outline",
+        native_min_value=MIN_CURRENT,
+        native_max_value=MAX_CURRENT,
+        native_step=1,
+        device_class=NumberDeviceClass.CURRENT,        
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
+    ),
+    NumberEntityDescription(
+        key="boostTime",
+        translation_key="boost_time",
+        icon="mdi:clock-fast",
+        native_min_value=0,
+        native_max_value=86340,  # 23 hours, 59 minutes
+        native_step=60,  # 1-minute resolution
+        native_unit_of_measurement=UnitOfTime.SECONDS,
+    ),
+    NumberEntityDescription(
+        key="kwhPrice",
+        translation_key="energy_price",
+        icon="mdi:cash-multiple",
+        native_min_value=0.0,
+        native_max_value=999.99,
+        native_step=0.01,
+        entity_category=EntityCategory.CONFIG,
     ),
 )
 
+CURRENT_KEYS = {"targetCurrent", "boostCurrent"}
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -67,7 +125,20 @@ class IntegrationEcovolterNumber(IntegrationEcovolterEntity, NumberEntity):
     @property
     def suggested_object_id(self) -> str:
         """This is used to generate the entity_id."""
-        return f"{DOMAIN}_{camel_to_snake(self.entity_description.key)}"
+        return camel_to_snake(self.entity_description.key)
+
+    @property
+    def native_max_value(self) -> float:
+        """Dynamic max for target/boost current based on maxCurrent setting."""
+        desc_max = cast(float, self.entity_description.native_max_value)
+
+        # For current-related entities, cap by maxCurrent if available
+        if self.entity_description.key in CURRENT_KEYS:
+            dynamic_max = self.coordinator.data.get(KEY_SETTINGS, {}).get("maxCurrent")
+            if isinstance(dynamic_max, (int, float)) and dynamic_max < desc_max:
+                return float(dynamic_max)
+
+        return desc_max
 
     @property
     def native_value(self) -> float | None:
@@ -75,9 +146,32 @@ class IntegrationEcovolterNumber(IntegrationEcovolterEntity, NumberEntity):
         value = self.coordinator.data.get(KEY_SETTINGS, {}).get(self.entity_description.key)
         return None if value is None else float(value)
 
+    @property
+    def native_unit_of_measurement(self) -> str | None:
+        """Return unit of measurement for the entity."""
+        if self.entity_description.key == "kwhPrice":
+            currency_raw = self.coordinator.data.get(KEY_SETTINGS, {}).get("currency")
+            currency_id = cast(int | None, currency_raw if isinstance(currency_raw, int) else None)
+            iso = CURRENCY_MAP.get(currency_id or -1, "EUR")
+            return f"{iso}/{UnitOfEnergy.KILO_WATT_HOUR}"
+        return self.entity_description.native_unit_of_measurement
+
     async def async_set_native_value(self, value: float) -> None:
         """Set a new value."""
+        key = self.entity_description.key
+
+        # For current-related entities, clamp dynamic limits
+        if key in CURRENT_KEYS:
+            min_v = float(self.entity_description.native_min_value or MIN_CURRENT)
+            max_v = self.native_max_value
+            value = int(max(min_v, min(value, max_v)))
+        # For energy price, round to two decimals
+        elif key == "kwhPrice":
+            value = round(float(value), 2)
+        else:
+            value = int(value)
+
         await self.coordinator.config_entry.runtime_data.client.async_set_settings(
-            {self.entity_description.key: int(value)}
+            {key: value}
         )
         await self.coordinator.async_request_refresh()

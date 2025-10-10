@@ -4,11 +4,16 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
+from homeassistant.components.switch import (
+    SwitchEntity,
+    SwitchEntityDescription,
+    SwitchDeviceClass,
+)
+
+from homeassistant.helpers.entity import EntityCategory
 
 from .utils import camel_to_snake
 from .const import (
-    DOMAIN,
     KEY_SETTINGS,
 )
 from .entity import IntegrationEcovolterEntity
@@ -24,16 +29,29 @@ if TYPE_CHECKING:
 ENTITY_DESCRIPTIONS: tuple[SwitchEntityDescription, ...] = (
     SwitchEntityDescription(
         key="isThreePhaseModeEnable",
-        translation_key="three_phase_mode_enabled",
-        icon="mdi:numeric-3-circle",
+        translation_key="charging_phase_mode",
+        device_class=SwitchDeviceClass.SWITCH,
     ),
     SwitchEntityDescription(
         key="isChargingEnable",
         translation_key="charging_enabled",
         icon="mdi:ev-station",
+        device_class=SwitchDeviceClass.SWITCH,
+    ),
+    SwitchEntityDescription(
+        key="isBoostModeEnable",
+        translation_key="boost_mode_enabled",
+        icon="mdi:lightning-bolt",
+        device_class=SwitchDeviceClass.SWITCH,
+    ),
+    SwitchEntityDescription(
+        key="isLocalPanelEnable",
+        translation_key="local_panel_enabled",
+        icon="mdi:monitor-lock",
+        device_class=SwitchDeviceClass.SWITCH,
+        entity_category=EntityCategory.CONFIG,
     ),
 )
-
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -48,7 +66,6 @@ async def async_setup_entry(
         )
         for entity_description in ENTITY_DESCRIPTIONS
     )
-
 
 class IntegrationEcovolterSwitch(IntegrationEcovolterEntity, SwitchEntity):
     """ecovolter switch class."""
@@ -68,7 +85,13 @@ class IntegrationEcovolterSwitch(IntegrationEcovolterEntity, SwitchEntity):
     @property
     def suggested_object_id(self) -> str:
         """This is used to generate the entity_id."""
-        return f"{DOMAIN}_{camel_to_snake(self.entity_description.key)}"
+        return camel_to_snake(self.entity_description.key)
+
+    @property
+    def icon(self) -> str | None:
+        if self.entity_description.key == "isThreePhaseModeEnable":
+            return "mdi:numeric-3-circle" if self.is_on else "mdi:numeric-1-circle"
+        return super().icon
 
     @property
     def is_on(self) -> bool | None:

@@ -32,6 +32,7 @@ PLATFORMS: list[Platform] = [
     Platform.NUMBER,
     Platform.BINARY_SENSOR,
     Platform.SENSOR,
+    Platform.SELECT,
 ]
 
 

@@ -27,30 +27,126 @@
   },
   "entity": {
     "sensor": {
+      "charged_energy": {
+        "name": "Charged Energy"
+      },
+      "charging_cost": {
+        "name": "Charging Cost"
+      },
+      "charging_time": {
+        "name": "Charging Time"
+      },
+      "remaining_boost_time": {
+        "name": "Remaining Boost Time"
+      },
       "actual_power": {
         "name": "Actual Power"
+      },
+      "current_l1": {
+        "name": "Current L1"
+      },
+      "current_l2": {
+        "name": "Current L2"
+      },
+      "current_l3": {
+        "name": "Current L3"
+      },
+      "voltage_l1": {
+        "name": "Voltage L1"
+      },
+      "voltage_l2": {
+        "name": "Voltage L2"
+      },
+      "voltage_l3": {
+        "name": "Voltage L3"
+      },
+      "temperature_current_limit": {
+        "name": "Temperature Current Limit"
+      },
+      "adapter_max_current": {
+        "name": "Adapter Max Current"
+      },
+      "temperature_internal": {
+        "name": "Temperature Internal"
+      },
+      "temperature_adapter1": {
+        "name": "Temperature Adapter 1"
+      },
+      "temperature_adapter2": {
+        "name": "Temperature Adapter 2"
+      },
+      "temperature_adapter3": {
+        "name": "Temperature Adapter 3"
+      },
+      "temperature_relay1": {
+        "name": "Temperature Relay 1"
+      },
+      "temperature_relay2": {
+        "name": "Temperature Relay 2"
       }
     },
     "switch": {
-      "three_phase_mode_enabled": {
-        "name": "3-Phase Mode Enabled"
+      "charging_phase_mode": {
+        "name": "Charging Phase Mode",
+        "state": {
+          "on": "3-Phase",
+          "off": "1-Phase"
+        }
       },
       "charging_enabled": {
-        "name": "Charging Enabled"
+          "name": "Charging"
+      },
+      "boost_mode_enabled": {
+          "name": "Boost Mode"
+      },
+      "local_panel_enabled": {
+          "name": "Local Panel"
       }
     },
     "number": {
       "target_current": {
         "name": "Target Current"
+      },
+      "boost_current": {
+        "name": "Boost Current"
+      },
+      "max_current": {
+        "name": "Maximum Current"
+      },
+      "boost_time": {
+        "name": "Boost Time"
+      },
+      "energy_price": {
+        "name": "Energy Price"
       }
     },
     "binary_sensor": {
-      "is_charging": {
+      "charging": {
         "name": "Charging"
+      },
+      "boost_mode_available": {
+        "name": "Boost Mode Available"
+      },
+      "boost_mode_active": {
+        "name": "Boost Mode Active"
+      },
+      "three_phase_mode_available": {
+        "name": "3-Phase Mode Available"
+      },
+      "three_phase_mode_active": {
+        "name": "3-Phase Mode Active"
       },
       "vehicle_connected": {
         "name": "Vehicle Connected"
+      },
+      "charging_schedule_active": {
+        "name": "Charging Schedule Active"
       }
-    }
+    },
+    "select": {
+      "currency": {
+        "name": "Currency"
+      }
+    }    
   }
 }

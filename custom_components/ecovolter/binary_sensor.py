@@ -12,7 +12,6 @@ from homeassistant.components.binary_sensor import (
 
 from .utils import camel_to_snake
 from .const import (
-    DOMAIN,
     KEY_STATUS,
 )
 from .entity import IntegrationEcovolterEntity
@@ -28,15 +27,45 @@ if TYPE_CHECKING:
 ENTITY_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
     BinarySensorEntityDescription(
         key="isCharging",
-        translation_key="is_charging",
+        translation_key="charging",
         icon="mdi:ev-station",
         device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
+    ),
+    BinarySensorEntityDescription(
+        key="isBoostModeAvailable",
+        translation_key="boost_mode_available",
+        icon="mdi:lightning-bolt-outline",
+        device_class=BinarySensorDeviceClass.POWER,
+    ),
+    BinarySensorEntityDescription(
+        key="isBoostModeActive",
+        translation_key="boost_mode_active",
+        icon="mdi:lightning-bolt",
+        device_class=BinarySensorDeviceClass.POWER,
+    ),    
+    BinarySensorEntityDescription(
+        key="isThreePhaseModeAvailable",
+        translation_key="three_phase_mode_available",
+        icon="mdi:numeric-3-circle-outline",
+        device_class=BinarySensorDeviceClass.POWER,
+    ),
+    BinarySensorEntityDescription(
+        key="isThreePhaseModeActive",
+        translation_key="three_phase_mode_active",
+        icon="mdi:numeric-3-circle",
+        device_class=BinarySensorDeviceClass.POWER,
     ),
     BinarySensorEntityDescription(
         key="isVehicleConnected",
         translation_key="vehicle_connected",
         icon="mdi:ev-plug-type2",
         device_class=BinarySensorDeviceClass.PLUG,
+    ),
+    BinarySensorEntityDescription(
+        key="isChargingScheduleActive",
+        translation_key="charging_schedule_active",
+        icon="mdi:calendar-clock",
+        device_class=BinarySensorDeviceClass.POWER,
     ),
 )
 
@@ -74,7 +103,7 @@ class IntegrationEcovolterBinarySensor(IntegrationEcovolterEntity, BinarySensorE
     @property
     def suggested_object_id(self) -> str:
         """This is used to generate the entity_id."""
-        return f"{DOMAIN}_{camel_to_snake(self.entity_description.key)}"
+        return camel_to_snake(self.entity_description.key)
 
     @property
     def is_on(self) -> bool | None:
