@@ -10,9 +10,9 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 
-from .utils import camel_to_snake
-from .const import (
-    KEY_STATUS,
+from .utils import (
+    camel_to_snake,
+    get_status
 )
 from .entity import IntegrationEcovolterEntity
 
@@ -108,5 +108,5 @@ class IntegrationEcovolterBinarySensor(IntegrationEcovolterEntity, BinarySensorE
     @property
     def is_on(self) -> bool | None:
         """Return true if the binary_sensor is on."""
-        val = self.coordinator.data.get(KEY_STATUS, {}).get(self.entity_description.key)
+        val = get_status(self.coordinator).get(self.entity_description.key)
         return None if val is None else bool(val)

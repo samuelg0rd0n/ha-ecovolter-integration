@@ -11,9 +11,9 @@ from homeassistant.components.select import (
 
 from homeassistant.helpers.entity import EntityCategory
 
-from .const import KEY_SETTINGS, CURRENCY_MAP, CURRENCY_INV_MAP
+from .const import CURRENCY_MAP, CURRENCY_INV_MAP
 from .entity import IntegrationEcovolterEntity
-from .utils import camel_to_snake
+from .utils import camel_to_snake, get_settings
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -70,7 +70,7 @@ class EcovolterCurrencySelect(IntegrationEcovolterEntity, SelectEntity):
     @property
     def current_option(self) -> str | None:
         """Map device int → ISO code."""
-        raw = self.coordinator.data.get(KEY_SETTINGS, {}).get("currency")
+        raw = get_settings(self.coordinator).get("currency")
         if isinstance(raw, int) and raw in CURRENCY_MAP:
             return CURRENCY_MAP[raw]
         return None  # unknown until we have valid data

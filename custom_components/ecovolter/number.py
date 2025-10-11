@@ -22,15 +22,20 @@ from homeassistant.const import (
 
 from homeassistant.helpers.entity import EntityCategory
 
-from .utils import camel_to_snake
+from .utils import (
+    camel_to_snake,
+    get_settings,
+    get_charger_type_maximum_charging_current,
+    clamp_int,
+    as_float,
+)
+
 from .const import (
-    KEY_SETTINGS,
-    KEY_TYPE_INFO,
     MIN_CURRENT,
     MAX_CURRENT,
-    CHARGER_TYPE_MAX_CURRENT,
     CURRENCY_MAP,
 )
+
 from .entity import IntegrationEcovolterEntity
 
 if TYPE_CHECKING:
@@ -137,21 +142,15 @@ class IntegrationEcovolterNumber(IntegrationEcovolterEntity, NumberEntity):
 
         # maxCurrent needs to be capped by charger type max current
         if key == "maxCurrent":
-            type_info = self.coordinator.data.get(KEY_TYPE_INFO) or {}
-            charger_type = type_info.get("chargerType")
-            type_max = CHARGER_TYPE_MAX_CURRENT.get(charger_type, MAX_CURRENT) if isinstance(charger_type, int) else MAX_CURRENT
-
-            return (float(type_max))
+            return (float(get_charger_type_maximum_charging_current(self.coordinator)))
 
         # For current-related entities, cap by maxCurrent if available
         if key in CURRENT_KEYS:
             # Use charger type limit if available
-            type_info = self.coordinator.data.get(KEY_TYPE_INFO) or {}
-            charger_type = type_info.get("chargerType")
-            type_max = CHARGER_TYPE_MAX_CURRENT.get(charger_type, MAX_CURRENT) if isinstance(charger_type, int) else MAX_CURRENT
+            type_max = get_charger_type_maximum_charging_current(self.coordinator)
 
             # Use maxCurrent setting if defined and lower than type_max
-            dynamic_max = self.coordinator.data.get(KEY_SETTINGS, {}).get("maxCurrent")
+            dynamic_max = get_settings(self.coordinator).get("maxCurrent")
 
             if isinstance(dynamic_max, (int, float)):
                 return float(min(dynamic_max, type_max))
@@ -162,14 +161,14 @@ class IntegrationEcovolterNumber(IntegrationEcovolterEntity, NumberEntity):
     @property
     def native_value(self) -> float | None:
         """Return the current value."""
-        value = self.coordinator.data.get(KEY_SETTINGS, {}).get(self.entity_description.key)
-        return None if value is None else float(value)
+        value = get_settings(self.coordinator).get(self.entity_description.key)
+        return as_float(value)
 
     @property
     def native_unit_of_measurement(self) -> str | None:
         """Return unit of measurement for the entity."""
         if self.entity_description.key == "kwhPrice":
-            currency_raw = self.coordinator.data.get(KEY_SETTINGS, {}).get("currency")
+            currency_raw = get_settings(self.coordinator).get("currency")
             currency_id = cast(int | None, currency_raw if isinstance(currency_raw, int) else None)
             iso = CURRENCY_MAP.get(currency_id or -1, "EUR")
             return f"{iso}/{UnitOfEnergy.KILO_WATT_HOUR}"
@@ -181,9 +180,9 @@ class IntegrationEcovolterNumber(IntegrationEcovolterEntity, NumberEntity):
 
         # For current-related entities, clamp dynamic limits
         if key in CURRENT_KEYS:
-            min_v = float(self.entity_description.native_min_value or MIN_CURRENT)
-            max_v = self.native_max_value
-            value = int(max(min_v, min(value, max_v)))
+            lo = int(self.entity_description.native_min_value or MIN_CURRENT)
+            hi = int(self.native_max_value)
+            value = clamp_int(int(value), lo, hi)
         # For energy price, round to two decimals
         elif key == "kwhPrice":
             value = round(float(value), 2)

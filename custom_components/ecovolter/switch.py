@@ -12,10 +12,7 @@ from homeassistant.components.switch import (
 
 from homeassistant.helpers.entity import EntityCategory
 
-from .utils import camel_to_snake
-from .const import (
-    KEY_SETTINGS,
-)
+from .utils import camel_to_snake, get_settings
 from .entity import IntegrationEcovolterEntity
 
 if TYPE_CHECKING:
@@ -96,7 +93,7 @@ class IntegrationEcovolterSwitch(IntegrationEcovolterEntity, SwitchEntity):
     @property
     def is_on(self) -> bool | None:
         """Return true if the switch is on."""
-        val = self.coordinator.data.get(KEY_SETTINGS, {}).get(self.entity_description.key)
+        val = get_settings(self.coordinator).get(self.entity_description.key)
         return None if val is None else bool(val)
 
     async def async_turn_on(self, **_: Any) -> None:

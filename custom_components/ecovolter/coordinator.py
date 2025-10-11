@@ -55,7 +55,7 @@ class EcovolterDataUpdateCoordinator(DataUpdateCoordinator[DataType]):
 
             # fetch type info once and cache
             if self._type_info_cache is None:
-                self._type_info_cache = await self.config_entry.runtime_data.client.async_get_type()
+                self._type_info_cache = await self.config_entry.runtime_data.client.async_get_type() # /api/v1/charger/type
 
         except EcovolterApiClientAuthenticationError as exception:
             raise ConfigEntryAuthFailed(exception) from exception

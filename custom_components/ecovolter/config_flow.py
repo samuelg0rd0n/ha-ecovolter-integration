@@ -28,6 +28,7 @@ from .const import (
     MIN_UPDATE_INTERVAL_SECONDS,
 )
 
+from .utils import as_int
 
 class EcovolterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Config flow for Ecovolter."""
@@ -52,10 +53,8 @@ class EcovolterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 base_uri = None            
 
             # Update interval (optional)
-            try:
-                interval = int(user_input.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL_SECONDS))
-            except (TypeError, ValueError):
-                interval = DEFAULT_UPDATE_INTERVAL_SECONDS
+            raw = user_input.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL_SECONDS)
+            interval = as_int(raw) or DEFAULT_UPDATE_INTERVAL_SECONDS
             if interval < MIN_UPDATE_INTERVAL_SECONDS:
                 interval = MIN_UPDATE_INTERVAL_SECONDS
 

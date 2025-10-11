@@ -22,6 +22,7 @@ from .const import (
 )
 from .coordinator import EcovolterDataUpdateCoordinator
 from .data import EcovolterData
+from .utils import as_int
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -48,10 +49,7 @@ async def async_setup_entry(
         CONF_UPDATE_INTERVAL,
         entry.data.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL_SECONDS),
     )
-    try:
-        interval_seconds = int(raw_interval)
-    except (TypeError, ValueError):
-        interval_seconds = DEFAULT_UPDATE_INTERVAL_SECONDS
+    interval_seconds = as_int(raw_interval) or DEFAULT_UPDATE_INTERVAL_SECONDS
 
     # Clamp to a sensible minimum
     interval_seconds = max(interval_seconds, MIN_UPDATE_INTERVAL_SECONDS)

@@ -27,13 +27,14 @@ from homeassistant.helpers.entity import EntityCategory
 
 from .utils import (
     camel_to_snake,
-    as_float
+    as_float,
+    get_status,
+    get_settings,
+    get_diagnostics,
+    get_type_info,
+    extract_temperature
 )
 from .const import (
-    KEY_STATUS,
-    KEY_SETTINGS,
-    KEY_DIAGNOSTICS,
-    KEY_TYPE_INFO,
     CURRENCY_MAP,
     CHARGER_TYPE_LABELS,
 )
@@ -322,47 +323,22 @@ class IntegrationEcovolterSensor(IntegrationEcovolterEntity, SensorEntity):
 
     def _native_value_status(self, key) -> float | None:
         """Return the native value of the status sensor."""
-        status = self.coordinator.data.get(KEY_STATUS) or {}
+        status = get_status(self.coordinator)
 
         # Special handling for temperature sensors (nested under status["temperatures"])
         if key in TEMPERATURE_KEYS:
-            temps = status.get("temperatures", {})
-            if key == "temperature_internal":
-                val = temps.get("internal")
-            elif key.startswith("temperature_adapter"):
-                idx = int(key[-1]) - 1
-                val = temps.get("adapter", [None])[idx]
-            elif key.startswith("temperature_relay"):
-                idx = int(key[-1]) - 1
-                val = temps.get("relay", [None])[idx]
-            else:
-                val = None
-
-            return as_float(val)
-
-        raw = status.get(key)
-        if raw is None:
-            return None
-
-        return as_float(raw)
+            return extract_temperature(status, key)
+        return as_float(status.get(key))
 
     def _native_value_diagnostics(self, key) -> float | None:
         """Return the native value of the diagnostics sensor."""
-        diagnostics = self.coordinator.data.get(KEY_DIAGNOSTICS) or {}
-        raw = diagnostics.get(key)
-        if raw is None:
-            return None
-
-        return as_float(raw)
+        diagnostics = get_diagnostics(self.coordinator)
+        return as_float(diagnostics.get(key))
 
     def _native_value_type(self, key) -> float | None:
         """Return the native value of the diagnostics sensor."""
-        type_info = self.coordinator.data.get(KEY_TYPE_INFO) or {}
-        raw = type_info.get(key)
-        if raw is None:
-            return None
-
-        return as_float(raw)
+        type_info = get_type_info(self.coordinator)
+        return as_float(type_info.get(key))
 
     @property
     def native_value(self) -> float | None:
@@ -380,12 +356,12 @@ class IntegrationEcovolterSensor(IntegrationEcovolterEntity, SensorEntity):
     def native_unit_of_measurement(self) -> str | None:
         """Return unit of measurement for the entity."""
         if self.entity_description.key == "kwhPrice":
-            currency_raw = self.coordinator.data.get(KEY_SETTINGS, {}).get("currency")
+            currency_raw = get_settings(self.coordinator).get("currency")
             currency_id = cast(int | None, currency_raw if isinstance(currency_raw, int) else None)
             iso = CURRENCY_MAP.get(currency_id or -1, "EUR")
             return f"{iso}/{UnitOfEnergy.KILO_WATT_HOUR}"
         elif self.entity_description.key == "chargingCost":
-            currency_raw = self.coordinator.data.get(KEY_SETTINGS, {}).get("currency")
+            currency_raw = get_settings(self.coordinator).get("currency")
             currency_id = cast(int | None, currency_raw if isinstance(currency_raw, int) else None)
             iso = CURRENCY_MAP.get(currency_id or -1, "EUR")
             return iso
@@ -413,7 +389,7 @@ class EcovolterChargerTypeSensor(IntegrationEcovolterEntity, SensorEntity):
 
     @property
     def native_value(self) -> str | None:
-        type_info = self.coordinator.data.get(KEY_TYPE_INFO, {}) or {}
+        type_info = get_type_info(self.coordinator)
         raw = type_info.get("chargerType")
         if isinstance(raw, int):
             return CHARGER_TYPE_LABELS[raw]
