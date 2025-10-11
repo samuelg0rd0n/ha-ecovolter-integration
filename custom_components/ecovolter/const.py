@@ -16,11 +16,10 @@ CONF_UPDATE_INTERVAL = "update_interval"
 DEFAULT_UPDATE_INTERVAL_SECONDS = 15
 MIN_UPDATE_INTERVAL_SECONDS = 5
 
-MIN_CURRENT = 6
-MAX_CURRENT = 16
-
 KEY_STATUS: Final = "status"
 KEY_SETTINGS: Final = "settings"
+KEY_DIAGNOSTICS: Final = "diagnostics"
+KEY_TYPE_INFO: Final = "type_info"
 
 CURRENCY_MAP: dict[int, str] = {
     0: "EUR",
@@ -42,3 +41,17 @@ CURRENCY_MAP: dict[int, str] = {
 
 # Reverse currency map
 CURRENCY_INV_MAP: dict[str, int] = {v: k for k, v in CURRENCY_MAP.items()}
+
+MIN_CURRENT = 6
+MAX_CURRENT = 32 # maximum current across all charger types
+# chargerType → per-phase max current
+CHARGER_TYPE_MAX_CURRENT = {
+    0: 16,  # 3x16A
+    1: 32,  # 3x32A
+}
+
+# chargerType → string description
+CHARGER_TYPE_LABELS = {
+    0: "3x16 A",
+    1: "3x32 A",
+}

@@ -83,6 +83,21 @@
       },
       "temperature_relay2": {
         "name": "Temperature Relay 2"
+      },
+      "total_charged_energy": {
+        "name": "Total Charged Energy"
+      },
+      "total_charging_count": {
+        "name": "Total Charging Count"
+      },
+      "total_charging_time": {
+        "name": "Total Charging Time"
+      },
+      "charging_power": {
+        "name": "Maximum Charging Power"
+      },
+      "charger_type": {
+        "name": "Charger Type"
       }
     },
     "switch": {

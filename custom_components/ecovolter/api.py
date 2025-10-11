@@ -54,19 +54,27 @@ class EcovolterApiClient:
         self._base_uri = base_uri.rstrip("/") if base_uri else None
         self._session = session
 
-    async def async_get_status(self) -> Any:
-        """Get settings data from Ecovolter."""
+    async def _async_get_data(self, path) -> Any:
         return await self._api_wrapper(
             method="get",
-            path="/status",
+            path=path,
         )
+
+    async def async_get_status(self) -> Any:
+        """Get settings data from Ecovolter."""
+        return await self._async_get_data(path="/status")
 
     async def async_get_settings(self) -> Any:
         """Get settings data from Ecovolter."""
-        return await self._api_wrapper(
-            method="get",
-            path="/settings",
-        )
+        return await self._async_get_data(path="/settings")
+
+    async def async_get_diagnostics(self) -> Any:
+        """Get settings data from Ecovolter."""
+        return await self._async_get_data(path="/diagnostic")
+
+    async def async_get_type(self) -> Any:
+        """Get settings data from Ecovolter."""
+        return await self._async_get_data(path="/type")
 
     async def async_set_settings(self, data: dict) -> Any:
         """Get settings data from Ecovolter."""

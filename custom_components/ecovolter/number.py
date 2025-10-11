@@ -25,8 +25,10 @@ from homeassistant.helpers.entity import EntityCategory
 from .utils import camel_to_snake
 from .const import (
     KEY_SETTINGS,
+    KEY_TYPE_INFO,
     MIN_CURRENT,
     MAX_CURRENT,
+    CHARGER_TYPE_MAX_CURRENT,
     CURRENCY_MAP,
 )
 from .entity import IntegrationEcovolterEntity
@@ -131,12 +133,29 @@ class IntegrationEcovolterNumber(IntegrationEcovolterEntity, NumberEntity):
     def native_max_value(self) -> float:
         """Dynamic max for target/boost current based on maxCurrent setting."""
         desc_max = cast(float, self.entity_description.native_max_value)
+        key = self.entity_description.key
+
+        # maxCurrent needs to be capped by charger type max current
+        if key == "maxCurrent":
+            type_info = self.coordinator.data.get(KEY_TYPE_INFO) or {}
+            charger_type = type_info.get("chargerType")
+            type_max = CHARGER_TYPE_MAX_CURRENT.get(charger_type, MAX_CURRENT) if isinstance(charger_type, int) else MAX_CURRENT
+
+            return (float(type_max))
 
         # For current-related entities, cap by maxCurrent if available
-        if self.entity_description.key in CURRENT_KEYS:
+        if key in CURRENT_KEYS:
+            # Use charger type limit if available
+            type_info = self.coordinator.data.get(KEY_TYPE_INFO) or {}
+            charger_type = type_info.get("chargerType")
+            type_max = CHARGER_TYPE_MAX_CURRENT.get(charger_type, MAX_CURRENT) if isinstance(charger_type, int) else MAX_CURRENT
+
+            # Use maxCurrent setting if defined and lower than type_max
             dynamic_max = self.coordinator.data.get(KEY_SETTINGS, {}).get("maxCurrent")
-            if isinstance(dynamic_max, (int, float)) and dynamic_max < desc_max:
-                return float(dynamic_max)
+
+            if isinstance(dynamic_max, (int, float)):
+                return float(min(dynamic_max, type_max))
+            return float(type_max)
 
         return desc_max
 
