@@ -83,7 +83,25 @@ I originally created this integration for my own use, but thought others might f
 - **Voltage (L1–L3)** – Voltage on each phase (V)  
 - **Temperature Current Limit** – Current limit imposed by thermal protection (A)  
 - **Adapter Max Current** – Maximum current allowed by the connected adapter (A)  
-- **Temperatures (Internal, Adapter 1–3, Relay 1–2)** – Temperature readings from internal, adapter, and relay sensors (°C)  
+
+**Temperatures (diagnostic):** (°C)
+- **Internal Temperature**
+- **Adapter Temperatures** (1–3)
+- **Relay Temperatures** (1–2)
+
+---
+
+### 📊 Lifetime monitoring (Sensors)
+- **Charging Power (Max)** — Reported maximum charging power (kW)
+- **Total Charged Energy** — Lifetime energy delivered (kWh)
+- **Total Charging Time** — Lifetime charging time (seconds)
+- **Total Charging Count** — Lifetime number of charging sessions
+
+---
+
+### 🛠️ Hardware / Capability (Sensors)
+- **Charger Type** — Hardware capability (3×16 A or 3×32 A)
+- **Charging Power (Max)** — Reported maximum charging power (kW)
 
 ## Requirements
 
