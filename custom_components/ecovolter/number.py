@@ -54,7 +54,7 @@ ENTITY_DESCRIPTIONS: tuple[NumberEntityDescription, ...]  = (
         native_min_value=MIN_CURRENT,
         native_max_value=MAX_CURRENT,
         native_step=1,
-        device_class=NumberDeviceClass.CURRENT,        
+        device_class=NumberDeviceClass.CURRENT,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
     ),
     NumberEntityDescription(
@@ -64,7 +64,7 @@ ENTITY_DESCRIPTIONS: tuple[NumberEntityDescription, ...]  = (
         native_min_value=MIN_CURRENT,
         native_max_value=MAX_CURRENT,
         native_step=1,
-        device_class=NumberDeviceClass.CURRENT,        
+        device_class=NumberDeviceClass.CURRENT,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
     ),
     NumberEntityDescription(
@@ -74,7 +74,7 @@ ENTITY_DESCRIPTIONS: tuple[NumberEntityDescription, ...]  = (
         native_min_value=MIN_CURRENT,
         native_max_value=MAX_CURRENT,
         native_step=1,
-        device_class=NumberDeviceClass.CURRENT,        
+        device_class=NumberDeviceClass.CURRENT,
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
     ),
     NumberEntityDescription(
@@ -84,6 +84,7 @@ ENTITY_DESCRIPTIONS: tuple[NumberEntityDescription, ...]  = (
         native_min_value=0,
         native_max_value=86340,  # 23 hours, 59 minutes
         native_step=60,  # 1-minute resolution
+        device_class=NumberDeviceClass.DURATION,
         native_unit_of_measurement=UnitOfTime.SECONDS,
     ),
     NumberEntityDescription(

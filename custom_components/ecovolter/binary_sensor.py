@@ -35,25 +35,21 @@ ENTITY_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
         key="isBoostModeAvailable",
         translation_key="boost_mode_available",
         icon="mdi:lightning-bolt-outline",
-        device_class=BinarySensorDeviceClass.POWER,
     ),
     BinarySensorEntityDescription(
         key="isBoostModeActive",
         translation_key="boost_mode_active",
         icon="mdi:lightning-bolt",
-        device_class=BinarySensorDeviceClass.POWER,
     ),    
     BinarySensorEntityDescription(
         key="isThreePhaseModeAvailable",
         translation_key="three_phase_mode_available",
         icon="mdi:numeric-3-circle-outline",
-        device_class=BinarySensorDeviceClass.POWER,
     ),
     BinarySensorEntityDescription(
         key="isThreePhaseModeActive",
         translation_key="three_phase_mode_active",
         icon="mdi:numeric-3-circle",
-        device_class=BinarySensorDeviceClass.POWER,
     ),
     BinarySensorEntityDescription(
         key="isVehicleConnected",

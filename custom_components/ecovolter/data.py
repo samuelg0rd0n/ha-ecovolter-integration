@@ -12,9 +12,7 @@ if TYPE_CHECKING:
     from .api import EcovolterApiClient
     from .coordinator import EcovolterDataUpdateCoordinator
 
-
 type EcovolterConfigEntry = ConfigEntry[EcovolterData]
-
 
 @dataclass
 class EcovolterData:
