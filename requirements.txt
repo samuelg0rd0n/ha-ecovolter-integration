@@ -2,3 +2,4 @@ pytest
 ruff
 mypy
 homeassistant
+pytest-homeassistant-custom-component
