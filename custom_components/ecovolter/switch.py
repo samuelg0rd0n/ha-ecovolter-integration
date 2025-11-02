@@ -50,6 +50,7 @@ ENTITY_DESCRIPTIONS: tuple[SwitchEntityDescription, ...] = (
     ),
 )
 
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: EcovolterConfigEntry,
@@ -64,6 +65,7 @@ async def async_setup_entry(
         for entity_description in ENTITY_DESCRIPTIONS
     )
 
+
 class IntegrationEcovolterSwitch(IntegrationEcovolterEntity, SwitchEntity):
     """ecovolter switch class."""
 
@@ -75,9 +77,7 @@ class IntegrationEcovolterSwitch(IntegrationEcovolterEntity, SwitchEntity):
         """Initialize the switch class."""
         super().__init__(coordinator)
         self.entity_description = entity_description
-        self._attr_unique_id = (
-            f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
-        )
+        self._attr_unique_id = f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
 
     @property
     def suggested_object_id(self) -> str:

@@ -30,6 +30,7 @@ from .const import (
 
 from .utils import as_int
 
+
 class EcovolterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     """Config flow for Ecovolter."""
 
@@ -45,12 +46,12 @@ class EcovolterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             # Normalize inputs
             serial = str(user_input.get(CONF_SERIAL_NUMBER, "")).strip().lower()
             secret = str(user_input.get(CONF_SECRET_KEY, "")).strip().lower()
-            
+
             base_uri = user_input.get(CONF_BASE_URI)
             if isinstance(base_uri, str) and base_uri.strip():
                 base_uri = base_uri.strip().rstrip("/")
             else:
-                base_uri = None            
+                base_uri = None
 
             # Update interval (optional)
             raw = user_input.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL_SECONDS)
@@ -79,7 +80,7 @@ class EcovolterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 # Ensure unique ID is the normalized serial
                 await self.async_set_unique_id(unique_id=serial)
                 self._abort_if_unique_id_configured()
-                
+
                 data: dict[str, Any] = {
                     CONF_SERIAL_NUMBER: serial,
                     CONF_SECRET_KEY: secret,
@@ -93,7 +94,7 @@ class EcovolterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     data=data,
                 )
 
-        defaults = user_input or {}    
+        defaults = user_input or {}
 
         return self.async_show_form(
             step_id="user",
@@ -125,7 +126,9 @@ class EcovolterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     ),
                     vol.Optional(
                         CONF_UPDATE_INTERVAL,
-                        default=defaults.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL_SECONDS),
+                        default=defaults.get(
+                            CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL_SECONDS
+                        ),
                     ): selector.NumberSelector(
                         selector.NumberSelectorConfig(
                             min=MIN_UPDATE_INTERVAL_SECONDS,
@@ -144,9 +147,9 @@ class EcovolterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> None:
         """Validate credentials."""
         client = EcovolterApiClient(
-           serial_number=serial_number,
-           secret_key=secret_key,
-           base_uri=base_uri,
-           session=async_create_clientsession(self.hass),
+            serial_number=serial_number,
+            secret_key=secret_key,
+            base_uri=base_uri,
+            session=async_create_clientsession(self.hass),
         )
         await client.async_get_status()

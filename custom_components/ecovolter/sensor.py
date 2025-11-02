@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-from typing import (
-    TYPE_CHECKING,
-    cast
-)
+from typing import TYPE_CHECKING, cast
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -32,7 +29,7 @@ from .utils import (
     get_settings,
     get_diagnostics,
     get_type_info,
-    extract_temperature
+    extract_temperature,
 )
 from .const import (
     CURRENCY_MAP,
@@ -83,8 +80,8 @@ ENTITY_DESCRIPTIONS = (
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfTime.SECONDS,
         suggested_display_precision=0,
-    ),    
-        SensorEntityDescription(
+    ),
+    SensorEntityDescription(
         key="actualPower",
         translation_key="actual_power",
         icon="mdi:flash",
@@ -230,7 +227,7 @@ ENTITY_DESCRIPTIONS = (
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         entity_category=EntityCategory.DIAGNOSTIC,
         suggested_display_precision=1,
-    ),   
+    ),
     # Some diagnostic sensors
     SensorEntityDescription(
         key="totalChargedEnergy",
@@ -268,9 +265,17 @@ ENTITY_DESCRIPTIONS = (
     ),
 )
 
-TEMPERATURE_KEYS={"temperature_internal", "temperature_adapter1", "temperature_adapter2", "temperature_adapter3", "temperature_relay1", "temperature_relay2"}
-DIAGNOSTIC_KEYS={"totalChargedEnergy", "totalChargingCount", "totalChargingTime"}
-TYPE_INFO_KEYS={"chargingPower"}
+TEMPERATURE_KEYS = {
+    "temperature_internal",
+    "temperature_adapter1",
+    "temperature_adapter2",
+    "temperature_adapter3",
+    "temperature_relay1",
+    "temperature_relay2",
+}
+DIAGNOSTIC_KEYS = {"totalChargedEnergy", "totalChargingCount", "totalChargingTime"}
+TYPE_INFO_KEYS = {"chargingPower"}
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -278,7 +283,7 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the sensor platform."""
-    
+
     entities: list[SensorEntity] = []
 
     # 1) generic sensors
@@ -291,15 +296,21 @@ async def async_setup_entry(
     )
 
     # 2) charger type sensor
-    entities.append(EcovolterChargerTypeSensor(entry.runtime_data.coordinator, SensorEntityDescription(
-        key="chargerType",
-        translation_key="charger_type",
-        icon="mdi:ev-plug-type2",
-        device_class=SensorDeviceClass.ENUM,
-        entity_category=EntityCategory.DIAGNOSTIC,
-    )))
+    entities.append(
+        EcovolterChargerTypeSensor(
+            entry.runtime_data.coordinator,
+            SensorEntityDescription(
+                key="chargerType",
+                translation_key="charger_type",
+                icon="mdi:ev-plug-type2",
+                device_class=SensorDeviceClass.ENUM,
+                entity_category=EntityCategory.DIAGNOSTIC,
+            ),
+        )
+    )
 
     async_add_entities(entities)
+
 
 class IntegrationEcovolterSensor(IntegrationEcovolterEntity, SensorEntity):
     """ecovolter sensor class."""
@@ -312,9 +323,7 @@ class IntegrationEcovolterSensor(IntegrationEcovolterEntity, SensorEntity):
         """Initialize the sensor class."""
         super().__init__(coordinator)
         self.entity_description = entity_description
-        self._attr_unique_id = (
-            f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
-        )
+        self._attr_unique_id = f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
 
     @property
     def suggested_object_id(self) -> str:
@@ -357,15 +366,20 @@ class IntegrationEcovolterSensor(IntegrationEcovolterEntity, SensorEntity):
         """Return unit of measurement for the entity."""
         if self.entity_description.key == "kwhPrice":
             currency_raw = get_settings(self.coordinator).get("currency")
-            currency_id = cast(int | None, currency_raw if isinstance(currency_raw, int) else None)
+            currency_id = cast(
+                int | None, currency_raw if isinstance(currency_raw, int) else None
+            )
             iso = CURRENCY_MAP.get(currency_id or -1, "EUR")
             return f"{iso}/{UnitOfEnergy.KILO_WATT_HOUR}"
         elif self.entity_description.key == "chargingCost":
             currency_raw = get_settings(self.coordinator).get("currency")
-            currency_id = cast(int | None, currency_raw if isinstance(currency_raw, int) else None)
+            currency_id = cast(
+                int | None, currency_raw if isinstance(currency_raw, int) else None
+            )
             iso = CURRENCY_MAP.get(currency_id or -1, "EUR")
             return iso
         return self.entity_description.native_unit_of_measurement
+
 
 class EcovolterChargerTypeSensor(IntegrationEcovolterEntity, SensorEntity):
     _attr_device_class = SensorDeviceClass.ENUM
@@ -377,10 +391,8 @@ class EcovolterChargerTypeSensor(IntegrationEcovolterEntity, SensorEntity):
     ):
         super().__init__(coordinator)
         self.entity_description = entity_description
-        self._attr_unique_id = (
-            f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
-        )
-        self._attr_options = [label for _, label in sorted(CHARGER_TYPE_LABELS.items())]        
+        self._attr_unique_id = f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
+        self._attr_options = [label for _, label in sorted(CHARGER_TYPE_LABELS.items())]
 
     @property
     def suggested_object_id(self) -> str:

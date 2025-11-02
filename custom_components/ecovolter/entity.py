@@ -24,10 +24,10 @@ class IntegrationEcovolterEntity(CoordinatorEntity[EcovolterDataUpdateCoordinato
         super().__init__(coordinator)
 
         serial = coordinator.config_entry.data.get(CONF_SERIAL_NUMBER) or "unknown"
-        
+
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, coordinator.config_entry.entry_id)},
             manufacturer="EcoVolter",
-            model="EcoVolter II",              # change if you detect model dynamically
-            name=f"EcoVolter ({serial})",      # -> shows up instead of "undefined"
+            model="EcoVolter II",  # change if you detect model dynamically
+            name=f"EcoVolter ({serial})",  # -> shows up instead of "undefined"
         )

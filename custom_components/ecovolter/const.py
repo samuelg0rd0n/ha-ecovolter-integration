@@ -43,7 +43,7 @@ CURRENCY_MAP: dict[int, str] = {
 CURRENCY_INV_MAP: dict[str, int] = {v: k for k, v in CURRENCY_MAP.items()}
 
 MIN_CURRENT = 6
-MAX_CURRENT = 32 # maximum current across all charger types
+MAX_CURRENT = 32  # maximum current across all charger types
 # chargerType → per-phase max current
 CHARGER_TYPE_MAX_CURRENT = {
     0: 16,  # 3x16A

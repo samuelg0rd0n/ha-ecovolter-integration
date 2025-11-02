@@ -10,10 +10,7 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 
-from .utils import (
-    camel_to_snake,
-    get_status
-)
+from .utils import camel_to_snake, get_status
 from .entity import IntegrationEcovolterEntity
 
 if TYPE_CHECKING:
@@ -40,7 +37,7 @@ ENTITY_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
         key="isBoostModeActive",
         translation_key="boost_mode_active",
         icon="mdi:lightning-bolt",
-    ),    
+    ),
     BinarySensorEntityDescription(
         key="isThreePhaseModeAvailable",
         translation_key="three_phase_mode_available",
@@ -92,9 +89,7 @@ class IntegrationEcovolterBinarySensor(IntegrationEcovolterEntity, BinarySensorE
         """Initialize the binary_sensor class."""
         super().__init__(coordinator)
         self.entity_description = entity_description
-        self._attr_unique_id = (
-            f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
-        )
+        self._attr_unique_id = f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
 
     @property
     def suggested_object_id(self) -> str:

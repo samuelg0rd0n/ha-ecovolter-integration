@@ -86,12 +86,14 @@ async def async_setup_entry(
 
     return True
 
+
 async def async_unload_entry(
     hass: HomeAssistant,
     entry: EcovolterConfigEntry,
 ) -> bool:
     """Handle removal of an entry."""
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
 
 async def async_reload_entry(
     hass: HomeAssistant,

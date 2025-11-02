@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 type EcovolterConfigEntry = ConfigEntry[EcovolterData]
 
+
 @dataclass
 class EcovolterData:
     """Data for the Ecovolter integration."""

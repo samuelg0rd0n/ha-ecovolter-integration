@@ -2,10 +2,7 @@
 
 from __future__ import annotations
 
-from typing import (
-    TYPE_CHECKING,
-    cast
-)
+from typing import TYPE_CHECKING, cast
 
 
 from homeassistant.components.number import (
@@ -46,7 +43,7 @@ if TYPE_CHECKING:
     from .data import EcovolterConfigEntry
 
 # Key is used to get the value from the API
-ENTITY_DESCRIPTIONS: tuple[NumberEntityDescription, ...]  = (
+ENTITY_DESCRIPTIONS: tuple[NumberEntityDescription, ...] = (
     NumberEntityDescription(
         key="targetCurrent",
         translation_key="target_current",
@@ -100,6 +97,7 @@ ENTITY_DESCRIPTIONS: tuple[NumberEntityDescription, ...]  = (
 
 CURRENT_KEYS = {"targetCurrent", "boostCurrent"}
 
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: EcovolterConfigEntry,
@@ -126,9 +124,7 @@ class IntegrationEcovolterNumber(IntegrationEcovolterEntity, NumberEntity):
         """Initialize the number class."""
         super().__init__(coordinator)
         self.entity_description = entity_description
-        self._attr_unique_id = (
-            f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
-        )
+        self._attr_unique_id = f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
 
     @property
     def suggested_object_id(self) -> str:
@@ -143,7 +139,7 @@ class IntegrationEcovolterNumber(IntegrationEcovolterEntity, NumberEntity):
 
         # maxCurrent needs to be capped by charger type max current
         if key == "maxCurrent":
-            return (float(get_charger_type_maximum_charging_current(self.coordinator)))
+            return float(get_charger_type_maximum_charging_current(self.coordinator))
 
         # For current-related entities, cap by maxCurrent if available
         if key in CURRENT_KEYS:
@@ -175,7 +171,9 @@ class IntegrationEcovolterNumber(IntegrationEcovolterEntity, NumberEntity):
         """Return unit of measurement for the entity."""
         if self.entity_description.key == "kwhPrice":
             currency_raw = get_settings(self.coordinator).get("currency")
-            currency_id = cast(int | None, currency_raw if isinstance(currency_raw, int) else None)
+            currency_id = cast(
+                int | None, currency_raw if isinstance(currency_raw, int) else None
+            )
             iso = CURRENCY_MAP.get(currency_id or -1, "EUR")
             return f"{iso}/{UnitOfEnergy.KILO_WATT_HOUR}"
         return self.entity_description.native_unit_of_measurement

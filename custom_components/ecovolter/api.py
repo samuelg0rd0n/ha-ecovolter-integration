@@ -16,6 +16,7 @@ import aiohttp
 class EcovolterApiClientError(Exception):
     """Exception to indicate a general API error."""
 
+
 class EcovolterApiClientCommunicationError(
     EcovolterApiClientError,
 ):
@@ -113,7 +114,7 @@ class EcovolterApiClient:
                     headers=headers,
                     json=data,
                 ),
-                timeout=10.0
+                timeout=10.0,
             )
             _verify_response_or_raise(response)
             return await response.json()

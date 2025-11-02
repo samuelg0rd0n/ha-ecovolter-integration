@@ -4,10 +4,7 @@ from typing import (
     TYPE_CHECKING,
 )
 
-from homeassistant.components.select import (
-    SelectEntity,
-    SelectEntityDescription
-)
+from homeassistant.components.select import SelectEntity, SelectEntityDescription
 
 from homeassistant.helpers.entity import EntityCategory
 
@@ -30,6 +27,7 @@ ENTITY_DESCRIPTIONS: tuple[SelectEntityDescription, ...] = (
     ),
 )
 
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: EcovolterConfigEntry,
@@ -43,6 +41,7 @@ async def async_setup_entry(
         for entity_description in ENTITY_DESCRIPTIONS
     )
 
+
 class EcovolterCurrencySelect(IntegrationEcovolterEntity, SelectEntity):
     """Currency selection."""
 
@@ -55,9 +54,7 @@ class EcovolterCurrencySelect(IntegrationEcovolterEntity, SelectEntity):
     ) -> None:
         super().__init__(coordinator)
         self.entity_description = entity_description
-        self._attr_unique_id = (
-            f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
-        )
+        self._attr_unique_id = f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
 
     @property
     def suggested_object_id(self) -> str:
