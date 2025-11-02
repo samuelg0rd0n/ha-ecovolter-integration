@@ -162,8 +162,13 @@ class IntegrationEcovolterNumber(IntegrationEcovolterEntity, NumberEntity):
     @property
     def native_value(self) -> float | None:
         """Return the current value."""
-        value = get_settings(self.coordinator).get(self.entity_description.key)
-        return as_float(value)
+        key = self.entity_description.key
+        value = get_settings(self.coordinator).get(key)
+        float_value = as_float(value)
+        # For energy price, round to two decimals
+        if key == "kwhPrice":
+            return None if float_value is None else round(float_value, 2)
+        return float_value
 
     @property
     def native_unit_of_measurement(self) -> str | None:

@@ -259,7 +259,7 @@ ENTITY_DESCRIPTIONS = (
     ),
     SensorEntityDescription(
         key="chargingPower",
-        translation_key="charging_power",
+        translation_key="max_charging_power",
         icon="mdi:flash-outline",
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
