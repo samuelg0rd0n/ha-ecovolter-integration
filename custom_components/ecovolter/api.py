@@ -16,6 +16,7 @@ import aiohttp
 class EcovolterApiClientError(Exception):
     """Exception to indicate a general API error."""
 
+
 class EcovolterApiClientCommunicationError(
     EcovolterApiClientError,
 ):
@@ -45,26 +46,36 @@ class EcovolterApiClient:
         self,
         serial_number: str,
         secret_key: str,
+        base_uri: str | None,
         session: aiohttp.ClientSession,
     ) -> None:
         """Sample API Client."""
         self._serial_number = serial_number
         self._secret_key = secret_key.encode("utf-8")  # bytes type
+        self._base_uri = base_uri.rstrip("/") if base_uri else None
         self._session = session
+
+    async def _async_get_data(self, path) -> Any:
+        return await self._api_wrapper(
+            method="get",
+            path=path,
+        )
 
     async def async_get_status(self) -> Any:
         """Get settings data from Ecovolter."""
-        return await self._api_wrapper(
-            method="get",
-            path="/status",
-        )
+        return await self._async_get_data(path="/status")
 
     async def async_get_settings(self) -> Any:
         """Get settings data from Ecovolter."""
-        return await self._api_wrapper(
-            method="get",
-            path="/settings",
-        )
+        return await self._async_get_data(path="/settings")
+
+    async def async_get_diagnostics(self) -> Any:
+        """Get settings data from Ecovolter."""
+        return await self._async_get_data(path="/diagnostic")
+
+    async def async_get_type(self) -> Any:
+        """Get settings data from Ecovolter."""
+        return await self._async_get_data(path="/type")
 
     async def async_set_settings(self, data: dict) -> Any:
         """Get settings data from Ecovolter."""
@@ -81,7 +92,8 @@ class EcovolterApiClient:
     ) -> Any:
         """Get information from the API."""
         timestamp_seconds = str(int(time()))
-        url = f"http://{self._serial_number}.local/api/v1/charger{path}"
+        base = self._base_uri or f"http://{self._serial_number}.local"
+        url = f"{base}/api/v1/charger{path}"
         json_data = json.dumps(data, separators=(",", ":"))
         data_to_sign = (
             f"{url}\n{timestamp_seconds}\n{'' if data is None else json_data}"
@@ -102,7 +114,7 @@ class EcovolterApiClient:
                     headers=headers,
                     json=data,
                 ),
-                timeout=10.0
+                timeout=10.0,
             )
             _verify_response_or_raise(response)
             return await response.json()

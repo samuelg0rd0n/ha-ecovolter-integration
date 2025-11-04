@@ -10,8 +10,7 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 
-from .utils import camel_to_snake
-from .const import DOMAIN
+from .utils import camel_to_snake, get_status
 from .entity import IntegrationEcovolterEntity
 
 if TYPE_CHECKING:
@@ -19,33 +18,54 @@ if TYPE_CHECKING:
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
     from .coordinator import EcovolterDataUpdateCoordinator
-    from .data import IntegrationEcovolterConfigEntry
+    from .data import EcovolterConfigEntry
 
 # Key is used to get the value from the API
-ENTITY_DESCRIPTIONS = (
+ENTITY_DESCRIPTIONS: tuple[BinarySensorEntityDescription, ...] = (
     BinarySensorEntityDescription(
         key="isCharging",
-        name="Is Charging?",
+        translation_key="charging",
         icon="mdi:ev-station",
         device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
     ),
     BinarySensorEntityDescription(
+        key="isBoostModeAvailable",
+        translation_key="boost_mode_available",
+        icon="mdi:lightning-bolt-outline",
+    ),
+    BinarySensorEntityDescription(
+        key="isBoostModeActive",
+        translation_key="boost_mode_active",
+        icon="mdi:lightning-bolt",
+    ),
+    BinarySensorEntityDescription(
+        key="isThreePhaseModeAvailable",
+        translation_key="three_phase_mode_available",
+        icon="mdi:numeric-3-circle-outline",
+    ),
+    BinarySensorEntityDescription(
+        key="isThreePhaseModeActive",
+        translation_key="three_phase_mode_active",
+        icon="mdi:numeric-3-circle",
+    ),
+    BinarySensorEntityDescription(
         key="isVehicleConnected",
-        name="Is Vehicle Connected?",
+        translation_key="vehicle_connected",
         icon="mdi:ev-plug-type2",
         device_class=BinarySensorDeviceClass.PLUG,
     ),
     BinarySensorEntityDescription(
-        key="isThreePhaseModeEnable",
-        name="3-Phase Mode Enabled",
-        icon="mdi:numeric-3-circle",
+        key="isChargingScheduleActive",
+        translation_key="charging_schedule_active",
+        icon="mdi:calendar-clock",
+        device_class=BinarySensorDeviceClass.POWER,
     ),
 )
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: IntegrationEcovolterConfigEntry,
+    entry: EcovolterConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the binary_sensor platform."""
@@ -69,19 +89,15 @@ class IntegrationEcovolterBinarySensor(IntegrationEcovolterEntity, BinarySensorE
         """Initialize the binary_sensor class."""
         super().__init__(coordinator)
         self.entity_description = entity_description
-        self._attr_unique_id = (
-            f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
-        )
-        self._attr_name = entity_description.name
+        self._attr_unique_id = f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
 
     @property
     def suggested_object_id(self) -> str:
         """This is used to generate the entity_id."""
-        return f"{DOMAIN}_{camel_to_snake(self.entity_description.key)}"
+        return camel_to_snake(self.entity_description.key)
 
     @property
-    def is_on(self) -> bool:
+    def is_on(self) -> bool | None:
         """Return true if the binary_sensor is on."""
-        return self.coordinator.data.get("status", {}).get(
-            self.entity_description.key, False
-        )
+        val = get_status(self.coordinator).get(self.entity_description.key)
+        return None if val is None else bool(val)

@@ -5,7 +5,11 @@ from __future__ import annotations
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import ATTRIBUTION
+from .const import (
+    ATTRIBUTION,
+    DOMAIN,
+    CONF_SERIAL_NUMBER,
+)
 from .coordinator import EcovolterDataUpdateCoordinator
 
 
@@ -13,16 +17,17 @@ class IntegrationEcovolterEntity(CoordinatorEntity[EcovolterDataUpdateCoordinato
     """EcovolterEntity class."""
 
     _attr_attribution = ATTRIBUTION
+    _attr_has_entity_name = True  # let HA compose "<Device name> <Entity name>"
 
     def __init__(self, coordinator: EcovolterDataUpdateCoordinator) -> None:
         """Initialize."""
         super().__init__(coordinator)
-        self._attr_unique_id = coordinator.config_entry.entry_id
+
+        serial = coordinator.config_entry.data.get(CONF_SERIAL_NUMBER) or "unknown"
+
         self._attr_device_info = DeviceInfo(
-            identifiers={
-                (
-                    coordinator.config_entry.domain,
-                    coordinator.config_entry.entry_id,
-                ),
-            },
+            identifiers={(DOMAIN, coordinator.config_entry.entry_id)},
+            manufacturer="EcoVolter",
+            model="EcoVolter II",  # change if you detect model dynamically
+            name=f"EcoVolter ({serial})",  # -> shows up instead of "undefined"
         )

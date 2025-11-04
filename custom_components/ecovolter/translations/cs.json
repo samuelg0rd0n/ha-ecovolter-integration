@@ -1,0 +1,167 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Přidat nabíječku EcoVolter",
+        "description": "Sériové číslo nabíječky lze najít přímo na nabíječce, popřípadě v aplikaci EV-Manager (iOS/Android). Tajný klíč je ve výchozím stavu stejný jako Sériové číslo. Pro pomoc s nastavením : https://github.com/samuelg0rd0n/ha-ecovolter-integration",
+        "data": {
+          "serial_number": "Sériové číslo nabíječky",
+          "secret_key": "Tajný klíč",
+          "base_uri": "EcoVolter URL",
+          "update_interval": "Interval aktualizace"
+        },
+        "data_description": {
+          "base_uri": "Nepovinné: použijte pokud vaše síť nepodporuje mDNS (.local).",
+          "update_interval": "Jak často Home Assistant stahuje aktuální hodnoty z nabíječky (v sekundách)."
+        }
+      }
+    },
+    "error": {
+      "auth": "Autentizace selhala. Nesprávný tajný klíč.",
+      "connection": "Nelze se připojit k nabíječce.",
+      "unknown": "Neznámá chyba."
+    },
+    "abort": {
+      "already_configured": "Toto zařízení je již nakonfigurováno."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "charged_energy": {
+        "name": "Nabitá energie"
+      },
+      "charging_cost": {
+        "name": "Cena nabíjení"
+      },
+      "charging_time": {
+        "name": "Doba nabíjení"
+      },
+      "remaining_boost_time": {
+        "name": "Zbývající čas Boost"
+      },
+      "actual_power": {
+        "name": "Nabíjecí výkon"
+      },
+      "current_l1": {
+        "name": "Proud L1"
+      },
+      "current_l2": {
+        "name": "Proud L2"
+      },
+      "current_l3": {
+        "name": "Proud L3"
+      },
+      "voltage_l1": {
+        "name": "Napětí L1"
+      },
+      "voltage_l2": {
+        "name": "Napětí L2"
+      },
+      "voltage_l3": {
+        "name": "Napětí L3"
+      },
+      "temperature_current_limit": {
+        "name": "Teplotní limit nabíjecího proudu"
+      },
+      "adapter_max_current": {
+        "name": "Maximální proud adaptéru"
+      },
+      "temperature_internal": {
+        "name": "Vnitřní teplota"
+      },
+      "temperature_adapter1": {
+        "name": "Teplota adaptéru 1"
+      },
+      "temperature_adapter2": {
+        "name": "Teplota adaptéru 2"
+      },
+      "temperature_adapter3": {
+        "name": "Teplota adaptéru 3"
+      },
+      "temperature_relay1": {
+        "name": "Teplota relé 1"
+      },
+      "temperature_relay2": {
+        "name": "Teplota relé 2"
+      },
+      "total_charged_energy": {
+        "name": "Celková nabitá energie"
+      },
+      "total_charging_count": {
+        "name": "Celkový počet nabíjení"
+      },
+      "total_charging_time": {
+        "name": "Celková doba nabíjení"
+      },
+      "max_charging_power": {
+        "name": "Maximální Nabíjecí výkon"
+      },
+      "charger_type": {
+        "name": "Typ nabíječky"
+      }
+    },
+    "switch": {
+      "charging_phase_mode": {
+        "name": "Režim fází nabíjení",
+        "state": {
+          "on": "Třífázový",
+          "off": "Jednofázový"
+        }
+      },
+      "charging_enabled": {
+          "name": "Nabíjení"
+      },
+      "boost_mode_enabled": {
+          "name": "Režim Boost"
+      },
+      "local_panel_enabled": {
+          "name": "Ovládací panel"
+      }
+    },
+    "number": {
+      "target_current": {
+        "name": "Cílový nabíjecí proud"
+      },
+      "boost_current": {
+        "name": "Boost proud"
+      },
+      "max_current": {
+        "name": "Maximální proud"
+      },
+      "boost_time": {
+        "name": "Trvání režimu Boost"
+      },
+      "energy_price": {
+        "name": "Cena energie"
+      }
+    },
+    "binary_sensor": {
+      "charging": {
+        "name": "Nabíjení"
+      },
+      "boost_mode_available": {
+        "name": "Režim Boost dostupný"
+      },
+      "boost_mode_active": {
+        "name": "Režim Boost aktivní"
+      },
+      "three_phase_mode_available": {
+        "name": "Třífázový režim dostupný"
+      },
+      "three_phase_mode_active": {
+        "name": "Třífázový režim aktivní"
+      },
+      "vehicle_connected": {
+        "name": "Vozidlo připojeno"
+      },
+      "charging_schedule_active": {
+        "name": "Plánované nabíjení aktivní"
+      }
+    },
+    "select": {
+      "currency": {
+        "name": "Měna"
+      }
+    }    
+  }
+}

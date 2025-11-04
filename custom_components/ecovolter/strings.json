@@ -37,7 +37,7 @@
         "name": "Charging time"
       },
       "remaining_boost_time": {
-        "name": "Remaining boost time"
+        "name": "Remaining Boost time"
       },
       "actual_power": {
         "name": "Actual power"

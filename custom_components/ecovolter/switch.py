@@ -4,10 +4,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
+from homeassistant.components.switch import (
+    SwitchEntity,
+    SwitchEntityDescription,
+    SwitchDeviceClass,
+)
 
-from .utils import camel_to_snake
-from .const import DOMAIN
+from homeassistant.helpers.entity import EntityCategory
+
+from .utils import camel_to_snake, get_settings
 from .entity import IntegrationEcovolterEntity
 
 if TYPE_CHECKING:
@@ -15,26 +20,40 @@ if TYPE_CHECKING:
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
     from .coordinator import EcovolterDataUpdateCoordinator
-    from .data import IntegrationEcovolterConfigEntry
+    from .data import EcovolterConfigEntry
 
 # Key is used to get the value from the API
-ENTITY_DESCRIPTIONS = (
+ENTITY_DESCRIPTIONS: tuple[SwitchEntityDescription, ...] = (
     SwitchEntityDescription(
         key="isThreePhaseModeEnable",
-        name="3-Phase Mode Enabled",
-        icon="mdi:numeric-3-circle",
+        translation_key="charging_phase_mode",
+        device_class=SwitchDeviceClass.SWITCH,
     ),
     SwitchEntityDescription(
         key="isChargingEnable",
-        name="Charging Enabled",
+        translation_key="charging_enabled",
         icon="mdi:ev-station",
+        device_class=SwitchDeviceClass.SWITCH,
+    ),
+    SwitchEntityDescription(
+        key="isBoostModeEnable",
+        translation_key="boost_mode_enabled",
+        icon="mdi:lightning-bolt",
+        device_class=SwitchDeviceClass.SWITCH,
+    ),
+    SwitchEntityDescription(
+        key="isLocalPanelEnable",
+        translation_key="local_panel_enabled",
+        icon="mdi:monitor-lock",
+        device_class=SwitchDeviceClass.SWITCH,
+        entity_category=EntityCategory.CONFIG,
     ),
 )
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: IntegrationEcovolterConfigEntry,
+    entry: EcovolterConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the switch platform."""
@@ -58,22 +77,24 @@ class IntegrationEcovolterSwitch(IntegrationEcovolterEntity, SwitchEntity):
         """Initialize the switch class."""
         super().__init__(coordinator)
         self.entity_description = entity_description
-        self._attr_unique_id = (
-            f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
-        )
-        self._attr_name = entity_description.name
+        self._attr_unique_id = f"{coordinator.config_entry.entry_id}_{camel_to_snake(entity_description.key)}"
 
     @property
     def suggested_object_id(self) -> str:
         """This is used to generate the entity_id."""
-        return f"{DOMAIN}_{camel_to_snake(self.entity_description.key)}"
+        return camel_to_snake(self.entity_description.key)
 
     @property
-    def is_on(self) -> bool:
+    def icon(self) -> str | None:
+        if self.entity_description.key == "isThreePhaseModeEnable":
+            return "mdi:numeric-3-circle" if self.is_on else "mdi:numeric-1-circle"
+        return super().icon
+
+    @property
+    def is_on(self) -> bool | None:
         """Return true if the switch is on."""
-        return self.coordinator.data.get("settings", {}).get(
-            self.entity_description.key, False
-        )
+        val = get_settings(self.coordinator).get(self.entity_description.key)
+        return None if val is None else bool(val)
 
     async def async_turn_on(self, **_: Any) -> None:
         """Turn on the switch."""

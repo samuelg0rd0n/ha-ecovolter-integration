@@ -34,33 +34,85 @@ I originally created this integration for my own use, but thought others might f
 3. Search for **"EcoVolter"** and select it
 4. Enter your EcoVolter charger's serial number. This can be found in the EV-Manager (iOS/Android app) or directly printed on the charger.
 5. Enter your charger's secret key. By default this is the same as your serial number. As of August 2025, EcoVolter says that the option to set secret key will be added to EV-Manager in the upcoming versions.
-6. Click **Submit**
+6. If your network setup does not support mDNS, enter the charger URL.
+7. You can modify the default polling interval.
+8. Click **Submit**
 
 ## Features
 
-### Binary Sensors
-- **Is Charging**: Shows whether the charger is actively charging your vehicle
-- **Is Vehicle Connected**: Indicates if a vehicle is plugged into the charger
-- **3-Phase Mode Enabled**: Shows the current phase mode status
+### 🧠 Monitoring (Binary Sensors)
+- **Charging Status** – Indicates whether the charger is actively charging your vehicle  
+- **Vehicle Connected** – Detects if a vehicle is plugged into the charger  
+- **Boost Mode Available** – Shows if boost-mode charging is currently available
+- **Boost Mode Active** – Displays whether boost-mode charging is currently active  
+- **3-Phase Mode Available** – Shows if 3-phase charging is available at the connected socket  
+- **3-Phase Mode Active** – Indicates whether 3-phase charging is currently in use  
+- **Charging Schedule Active** – Signals whether a charging schedule (calendar) is controlling the charger  
 
-### Sensors
-- **Actual Power**: Real-time power consumption in watts
+---
 
-### Controls
-- **Start/Stop Charging**: Control charging sessions
-- **Set Target Current**: Adjust the charging current (6A to 16A)
-- **3-Phase Mode Control**: Enable or disable 3-phase charging mode
+### ⚙️ Controls (Switches)
+- **Charging Enabled** – Enables or disables charging entirely  
+- **3-Phase Mode Control** – Switch between single-phase and three-phase charging  
+- **Boost Mode Enabled** – Activates or deactivates boost mode  
+- **Local Panel Enabled** – Enables or disables local panel (on-device) control  
+
+---
+
+### 🔢 Adjustable Parameters (Numbers)
+- **Target Current** – Desired charging current (6–16 A)  
+- **Boost Current** – Charging current during boost period (6–16 A)  
+- **Maximum Current** – Upper limit for target and boost current (6–16 A)  
+- **Boost Time** – Duration of the boost-current period, in seconds (up to 24 h)  
+- **Energy Price** – Configurable price per kWh, used for calculating charging cost  
+
+---
+
+### 💱 Configuration (Selects)
+- **Currency** – Selects the currency used for cost calculations  
+
+---
+
+### 📊 Measurements (Sensors)
+- **Actual Power** – Real-time charging power (kW)  
+- **Charged Energy** – Energy delivered during the current session (kWh)  
+- **Charging Cost** – Calculated session cost in the selected currency  
+- **Charging Time** – Elapsed time of the current charging session (seconds)  
+- **Remaining Boost Time** – Remaining duration of the active boost period (seconds)  
+- **Current (L1–L3)** – Measured current on each phase (A)  
+- **Voltage (L1–L3)** – Voltage on each phase (V)  
+- **Temperature Current Limit** – Current limit imposed by thermal protection (A)  
+- **Adapter Max Current** – Maximum current allowed by the connected adapter (A)  
+
+**Temperatures (diagnostic):** (°C)
+- **Internal Temperature**
+- **Adapter Temperatures** (1–3)
+- **Relay Temperatures** (1–2)
+
+---
+
+### 📊 Lifetime monitoring (Sensors)
+- **Charging Power (Max)** — Reported maximum charging power (kW)
+- **Total Charged Energy** — Lifetime energy delivered (kWh)
+- **Total Charging Time** — Lifetime charging time (seconds)
+- **Total Charging Count** — Lifetime number of charging sessions
+
+---
+
+### 🛠️ Hardware / Capability (Sensors)
+- **Charger Type** — Hardware capability (3×16 A or 3×32 A)
+- **Charging Power (Max)** — Reported maximum charging power (kW)
 
 ## Requirements
 
 - Home Assistant 2023.8.0 or newer
 - EcoVolter II (2nd generation) EV charger with network connectivity
-- mDNS support in your setup
+- Base URL (with IP address or DNS record) unless you are using mDNS in your setup
 
 ## Troubleshooting
 
 - **Integration not found**: Make sure you've restarted Home Assistant after installation
-- **Connection failed**: Verify your charger's serial number and network connectivity
+- **Connection failed**: Verify your charger's serial number, URL and network connectivity
 - **Authentication error**: Check your charger's secret key
 
 ## Support

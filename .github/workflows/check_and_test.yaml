@@ -1,0 +1,53 @@
+name: Run checks and tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check_and_test:
+    runs-on: ubuntu-latest
+    name: Check and test code
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run mypy
+        run: |
+          mypy custom_components/ecovolter
+          mypy tests
+    
+      - name: Run ruff
+        run: |
+          ruff check .
+    
+      - name: Run tests
+        run: |
+          pytest tests -v --maxfail=1 --disable-warnings
+
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate
+
+    steps:
+      - name: Checkout code
+        uses: "actions/checkout@v4"
+
+      - name: HACS validation
+        uses: "hacs/action@main"
+        with:
+          category: "integration"
+
+      - name: Hassfest validation
+        uses: "home-assistant/actions/hassfest@master"
