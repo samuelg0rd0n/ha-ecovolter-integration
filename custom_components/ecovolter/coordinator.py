@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
+from logging import Logger
 from typing import TYPE_CHECKING, Any, TypedDict
 
+from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.helpers.debounce import Debouncer
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import (
@@ -17,6 +21,9 @@ from .const import (
     KEY_SETTINGS,
     KEY_DIAGNOSTICS,
     KEY_TYPE_INFO,
+    LOGGER,
+    MAX_CONSECUTIVE_FAILURES,
+    WRITE_REFRESH_DEBOUNCE_SECONDS,
 )
 
 if TYPE_CHECKING:
@@ -39,6 +46,44 @@ class EcovolterDataUpdateCoordinator(DataUpdateCoordinator[DataType]):
     config_entry: EcovolterConfigEntry
 
     _type_info_cache: dict[str, Any] | None = None
+    _consecutive_failures: int = 0
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        logger: Logger,
+        name: str,
+        update_interval: timedelta,
+    ) -> None:
+        """Initialize the coordinator with a debounced post-write refresh.
+
+        ``async_request_refresh()`` (the debounced path, used by the write
+        sites) coalesces a burst of writes into one read-back poll
+        ``WRITE_REFRESH_DEBOUNCE_SECONDS`` after the last write. The
+        coordinator wires ``function=self._async_refresh`` onto the supplied
+        debouncer itself.
+        """
+        super().__init__(
+            hass=hass,
+            logger=logger,
+            name=name,
+            update_interval=update_interval,
+            request_refresh_debouncer=Debouncer(
+                hass,
+                logger,
+                cooldown=WRITE_REFRESH_DEBOUNCE_SECONDS,
+                immediate=False,
+            ),
+        )
+
+    @property
+    def data_is_fresh(self) -> bool:
+        """True only right after a real successful poll.
+
+        False while serving tolerated-stale data, so the optimistic layer
+        never confirms or times out an optimistic value against stale data.
+        """
+        return self._consecutive_failures == 0
 
     async def _async_update_data(self) -> DataType:
         """Update data via library."""
@@ -60,10 +105,29 @@ class EcovolterDataUpdateCoordinator(DataUpdateCoordinator[DataType]):
                 )  # /api/v1/charger/type
 
         except EcovolterApiClientAuthenticationError as exception:
+            # Auth failures are never tolerated; the counter is left untouched.
             raise ConfigEntryAuthFailed(exception) from exception
         except EcovolterApiClientError as exception:
+            self._consecutive_failures += 1
+            # Serve last-good data through the first MAX_CONSECUTIVE_FAILURES
+            # failures so a single slow response doesn't blip every entity to
+            # unavailable. The ``self.data is None`` guard ensures a failure
+            # during async_config_entry_first_refresh still raises (and HA
+            # surfaces ConfigEntryNotReady) rather than returning empty data.
+            if (
+                self._consecutive_failures <= MAX_CONSECUTIVE_FAILURES
+                and self.data is not None
+            ):
+                LOGGER.warning(
+                    "EcoVolter poll failed (%s/%s), keeping last good data: %s",
+                    self._consecutive_failures,
+                    MAX_CONSECUTIVE_FAILURES,
+                    exception,
+                )
+                return self.data
             raise UpdateFailed(exception) from exception
         else:
+            self._consecutive_failures = 0
             data: DataType = {
                 KEY_STATUS: status,
                 KEY_SETTINGS: settings,

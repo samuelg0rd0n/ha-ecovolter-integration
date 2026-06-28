@@ -54,6 +54,10 @@ class EcovolterApiClient:
         self._secret_key = secret_key.encode("utf-8")  # bytes type
         self._base_uri = base_uri.rstrip("/") if base_uri else None
         self._session = session
+        # Serialize all device access: the charger's embedded HTTP server is a
+        # single-connection device, so a write PATCH and a poll GET must never
+        # hit it concurrently. The Lock binds to the running loop on first await.
+        self._request_lock = asyncio.Lock()
 
     async def _async_get_data(self, path) -> Any:
         return await self._api_wrapper(
@@ -107,17 +111,20 @@ class EcovolterApiClient:
         }
 
         try:
-            response = await asyncio.wait_for(
-                self._session.request(
-                    method=method,
-                    url=url,
-                    headers=headers,
-                    json=data,
-                ),
-                timeout=10.0,
-            )
-            _verify_response_or_raise(response)
-            return await response.json()
+            # Hold the lock across the full request: send, status check, and
+            # body read must complete before another request touches the device.
+            async with self._request_lock:
+                response = await asyncio.wait_for(
+                    self._session.request(
+                        method=method,
+                        url=url,
+                        headers=headers,
+                        json=data,
+                    ),
+                    timeout=10.0,
+                )
+                _verify_response_or_raise(response)
+                return await response.json()
 
         except TimeoutError as exception:
             msg = f"Timeout error fetching information - {exception}"

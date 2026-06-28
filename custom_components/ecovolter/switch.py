@@ -13,7 +13,7 @@ from homeassistant.components.switch import (
 from homeassistant.helpers.entity import EntityCategory
 
 from .utils import camel_to_snake, get_settings
-from .entity import IntegrationEcovolterEntity
+from .entity import OptimisticEcovolterEntity
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -66,7 +66,7 @@ async def async_setup_entry(
     )
 
 
-class IntegrationEcovolterSwitch(IntegrationEcovolterEntity, SwitchEntity):
+class IntegrationEcovolterSwitch(OptimisticEcovolterEntity, SwitchEntity):
     """ecovolter switch class."""
 
     def __init__(
@@ -90,17 +90,27 @@ class IntegrationEcovolterSwitch(IntegrationEcovolterEntity, SwitchEntity):
             return "mdi:numeric-3-circle" if self.is_on else "mdi:numeric-1-circle"
         return super().icon
 
-    @property
-    def is_on(self) -> bool | None:
-        """Return true if the switch is on."""
+    def _device_value(self) -> bool | None:
+        """Raw coordinator value normalized to the optimistic (bool) domain."""
         val = get_settings(self.coordinator).get(self.entity_description.key)
         return None if val is None else bool(val)
 
+    @property
+    def is_on(self) -> bool | None:
+        """Return true if the switch is on."""
+        if self._optimistic_set:
+            return self._optimistic_value
+        return self._device_value()
+
     async def async_turn_on(self, **_: Any) -> None:
         """Turn on the switch."""
+        # PATCH first; only set optimistic on success. If it raises, let it
+        # propagate — HA surfaces the error and the property falls back to
+        # coordinator data.
         await self.coordinator.config_entry.runtime_data.client.async_set_settings(
             {self.entity_description.key: True}
         )
+        self._apply_optimistic(True)
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **_: Any) -> None:
@@ -108,4 +118,5 @@ class IntegrationEcovolterSwitch(IntegrationEcovolterEntity, SwitchEntity):
         await self.coordinator.config_entry.runtime_data.client.async_set_settings(
             {self.entity_description.key: False}
         )
+        self._apply_optimistic(False)
         await self.coordinator.async_request_refresh()

@@ -16,6 +16,16 @@ CONF_UPDATE_INTERVAL = "update_interval"
 DEFAULT_UPDATE_INTERVAL_SECONDS = 15
 MIN_UPDATE_INTERVAL_SECONDS = 5
 
+# Tolerate this many consecutive failed polls before marking entities unavailable;
+# entities keep their last-good values through failures 1–N, go unavailable on N+1.
+MAX_CONSECUTIVE_FAILURES: Final = 3
+# Coalesce post-write read-back refreshes into a single poll after the last write.
+WRITE_REFRESH_DEBOUNCE_SECONDS: Final = 2.0
+# How long an optimistic value is held before reverting to coordinator truth.
+# Must be ≥ debounce + worst-case single poll (lock wait + 10s request) so a
+# *successful* write never flashes back before the device confirms it.
+OPTIMISTIC_TIMEOUT_SECONDS: Final = 10.0
+
 KEY_STATUS: Final = "status"
 KEY_SETTINGS: Final = "settings"
 KEY_DIAGNOSTICS: Final = "diagnostics"

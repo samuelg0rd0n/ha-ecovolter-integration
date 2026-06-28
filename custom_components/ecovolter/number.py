@@ -33,7 +33,7 @@ from .const import (
     CURRENCY_MAP,
 )
 
-from .entity import IntegrationEcovolterEntity
+from .entity import OptimisticEcovolterEntity
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -113,8 +113,11 @@ async def async_setup_entry(
     )
 
 
-class IntegrationEcovolterNumber(IntegrationEcovolterEntity, NumberEntity):
+class IntegrationEcovolterNumber(OptimisticEcovolterEntity, NumberEntity):
     """ecovolter number class."""
+
+    # Tolerance to survive float round-trip drift on kwhPrice and int echoes.
+    _OPTIMISTIC_TOLERANCE = 0.005
 
     def __init__(
         self,
@@ -155,12 +158,24 @@ class IntegrationEcovolterNumber(IntegrationEcovolterEntity, NumberEntity):
 
         return desc_max
 
+    def _device_value(self) -> float | None:
+        """Raw coordinator value normalized to the optimistic (float) domain."""
+        value = get_settings(self.coordinator).get(self.entity_description.key)
+        return as_float(value)
+
+    def _values_match(self, optimistic_raw: float, device_raw: float | None) -> bool:
+        """Confirm within tolerance (float round-trip drift / int echoes)."""
+        if device_raw is None:
+            return False
+        return abs(optimistic_raw - device_raw) <= self._OPTIMISTIC_TOLERANCE
+
     @property
     def native_value(self) -> float | None:
         """Return the current value."""
         key = self.entity_description.key
-        value = get_settings(self.coordinator).get(key)
-        float_value = as_float(value)
+        if self._optimistic_set:
+            return self._optimistic_value
+        float_value = self._device_value()
         # For energy price, round to two decimals
         if key == "kwhPrice":
             return None if float_value is None else round(float_value, 2)
@@ -196,4 +211,7 @@ class IntegrationEcovolterNumber(IntegrationEcovolterEntity, NumberEntity):
         await self.coordinator.config_entry.runtime_data.client.async_set_settings(
             {key: value}
         )
+        # Store the post-clamp/round/int value actually sent — a 40 A request
+        # clamped to 32 A must show 32, never 40.
+        self._apply_optimistic(value)
         await self.coordinator.async_request_refresh()

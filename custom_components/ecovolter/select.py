@@ -8,8 +8,10 @@ from homeassistant.components.select import SelectEntity, SelectEntityDescriptio
 
 from homeassistant.helpers.entity import EntityCategory
 
+from typing import Any
+
 from .const import CURRENCY_MAP, CURRENCY_INV_MAP
-from .entity import IntegrationEcovolterEntity
+from .entity import OptimisticEcovolterEntity
 from .utils import camel_to_snake, get_settings
 
 if TYPE_CHECKING:
@@ -42,7 +44,7 @@ async def async_setup_entry(
     )
 
 
-class EcovolterCurrencySelect(IntegrationEcovolterEntity, SelectEntity):
+class EcovolterCurrencySelect(OptimisticEcovolterEntity, SelectEntity):
     """Currency selection."""
 
     _options = list(CURRENCY_INV_MAP.keys())
@@ -64,10 +66,16 @@ class EcovolterCurrencySelect(IntegrationEcovolterEntity, SelectEntity):
     def options(self) -> list[str]:
         return self._options
 
+    def _device_value(self) -> Any:
+        """Raw coordinator currency value (int) — the optimistic domain."""
+        return get_settings(self.coordinator).get("currency")
+
     @property
     def current_option(self) -> str | None:
         """Map device int → ISO code."""
-        raw = get_settings(self.coordinator).get("currency")
+        if self._optimistic_set:
+            return CURRENCY_MAP.get(self._optimistic_value)
+        raw = self._device_value()
         if isinstance(raw, int) and raw in CURRENCY_MAP:
             return CURRENCY_MAP[raw]
         return None  # unknown until we have valid data
@@ -80,4 +88,6 @@ class EcovolterCurrencySelect(IntegrationEcovolterEntity, SelectEntity):
         await self.coordinator.config_entry.runtime_data.client.async_set_settings(
             {"currency": value}
         )
+        # Comparison is int-vs-int against get_settings()['currency'].
+        self._apply_optimistic(value)
         await self.coordinator.async_request_refresh()
