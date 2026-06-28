@@ -13,3 +13,9 @@
 !custom_components/
 !custom_components/**
 custom_components/ecovolter/__pycache__
+
+# And not the test suite
+!tests/
+!tests/**
+tests/__pycache__/
+**/__pycache__/

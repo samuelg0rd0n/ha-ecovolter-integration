@@ -174,7 +174,9 @@ class IntegrationEcovolterNumber(OptimisticEcovolterEntity, NumberEntity):
         """Return the current value."""
         key = self.entity_description.key
         if self._optimistic_set:
-            return self._optimistic_value
+            # Stored raw is the post-transform value sent (int for currents,
+            # rounded float for price); map to the float display domain.
+            return as_float(self._optimistic_value)
         float_value = self._device_value()
         # For energy price, round to two decimals
         if key == "kwhPrice":
