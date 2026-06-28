@@ -111,17 +111,16 @@ class EcovolterApiClient:
         }
 
         try:
-            # Hold the lock across the full request: send, status check, and
-            # body read must complete before another request touches the device.
-            async with self._request_lock:
-                response = await asyncio.wait_for(
-                    self._session.request(
-                        method=method,
-                        url=url,
-                        headers=headers,
-                        json=data,
-                    ),
-                    timeout=10.0,
+            # Serialize device access and bound the whole exchange (send, status
+            # check, body read). Bounding the body read too — not just the send —
+            # guarantees the lock is never held longer than the timeout on a
+            # single-connection device with a stalled response.
+            async with self._request_lock, asyncio.timeout(10.0):
+                response = await self._session.request(
+                    method=method,
+                    url=url,
+                    headers=headers,
+                    json=data,
                 )
                 _verify_response_or_raise(response)
                 return await response.json()

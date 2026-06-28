@@ -56,12 +56,16 @@ class OptimisticEcovolterEntity(IntegrationEcovolterEntity):
     _optimistic_expiry: float = 0.0
 
     def _apply_optimistic(self, raw_value: Any) -> None:
-        """Record the just-written raw value and show it immediately."""
+        """Record the just-written raw value and show it immediately.
+
+        Only ever called from the write handlers (async_turn_*/async_set_*),
+        which HA invokes after the entity is added to hass, so ``self.hass`` and
+        the entity_id are always set here.
+        """
         self._optimistic_value = raw_value
         self._optimistic_expiry = self.hass.loop.time() + OPTIMISTIC_TIMEOUT_SECONDS
         self._optimistic_set = True
-        if self.hass is not None:  # guard: no-op before entity added to hass
-            self.async_write_ha_state()
+        self.async_write_ha_state()
 
     def _clear_optimistic(self) -> None:
         """Drop optimistic state and fall back to coordinator truth."""

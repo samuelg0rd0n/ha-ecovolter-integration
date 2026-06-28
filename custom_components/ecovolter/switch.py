@@ -99,7 +99,7 @@ class IntegrationEcovolterSwitch(OptimisticEcovolterEntity, SwitchEntity):
     def is_on(self) -> bool | None:
         """Return true if the switch is on."""
         if self._optimistic_set:
-            return self._optimistic_value
+            return bool(self._optimistic_value)
         return self._device_value()
 
     async def async_turn_on(self, **_: Any) -> None:
