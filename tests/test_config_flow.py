@@ -64,10 +64,10 @@ def verify_cleanup():
 
 @pytest.mark.asyncio
 async def test_create_entry_success(hass: HomeAssistant, api) -> None:
-    """Happy path: creates entry; serial/secret lower-cased; base_uri normalized; interval honored."""
+    """Happy path: creates entry; serial lower-cased, secret preserved as-is; base_uri normalized; interval honored."""
     user_input = {
         CONF_SERIAL_NUMBER: "REVCR01A00000001",            # will be lowercased
-        CONF_SECRET_KEY: "REVCR01A00000001",               # will be lowercased
+        CONF_SECRET_KEY: "SeCrEt-KeY-01A",                 # case preserved (HMAC secret is case-sensitive)
         CONF_BASE_URI: "http://ecovolter.test///",         # will be rstrip('/') -> http://ecovolter.test
         CONF_UPDATE_INTERVAL: 17,
     }
@@ -83,7 +83,7 @@ async def test_create_entry_success(hass: HomeAssistant, api) -> None:
     data = result["data"]
 
     assert data[CONF_SERIAL_NUMBER] == "revcr01a00000001"
-    assert data[CONF_SECRET_KEY] == "revcr01a00000001"
+    assert data[CONF_SECRET_KEY] == "SeCrEt-KeY-01A"
     assert data[CONF_BASE_URI] == "http://ecovolter.test"
     assert data[CONF_UPDATE_INTERVAL] == 17
 
