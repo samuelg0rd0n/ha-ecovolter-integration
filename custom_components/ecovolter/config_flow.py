@@ -45,7 +45,7 @@ class EcovolterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             # Normalize inputs
             serial = str(user_input.get(CONF_SERIAL_NUMBER, "")).strip().lower()
-            secret = str(user_input.get(CONF_SECRET_KEY, "")).strip().lower()
+            secret = str(user_input.get(CONF_SECRET_KEY, "")).strip()
 
             base_uri = user_input.get(CONF_BASE_URI)
             if isinstance(base_uri, str) and base_uri.strip():
