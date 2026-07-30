@@ -234,7 +234,7 @@ ENTITY_DESCRIPTIONS = (
         translation_key="total_charged_energy",
         icon="mdi:lightning-bolt-circle",
         device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL_INCREASING,
+        state_class=SensorStateClass.TOTAL,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         suggested_display_precision=3,
     ),
