@@ -219,9 +219,7 @@ class IntegrationEcovolterNumber(OptimisticEcovolterEntity, NumberEntity):
             )
             return
 
-        await self.coordinator.config_entry.runtime_data.client.async_set_settings(
-            {key: value}
-        )
+        await self._async_set_settings({key: value})
         # Store the post-clamp/round/int value actually sent — a 40 A request
         # clamped to 32 A must show 32, never 40.
         self._apply_optimistic(value)

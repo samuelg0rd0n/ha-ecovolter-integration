@@ -5,12 +5,13 @@ from typing import (
 )
 
 from homeassistant.components.select import SelectEntity, SelectEntityDescription
+from homeassistant.exceptions import ServiceValidationError
 
 from homeassistant.helpers.entity import EntityCategory
 
 from typing import Any
 
-from .const import CURRENCY_MAP, CURRENCY_INV_MAP, LOGGER
+from .const import CURRENCY_MAP, CURRENCY_INV_MAP, DOMAIN, LOGGER
 from .entity import OptimisticEcovolterEntity
 from .utils import camel_to_snake, get_settings
 
@@ -84,7 +85,11 @@ class EcovolterCurrencySelect(OptimisticEcovolterEntity, SelectEntity):
         """Map ISO code → device int and write."""
         value = CURRENCY_INV_MAP.get(option)
         if value is None:
-            raise ValueError(f"Unsupported currency option: {option}")
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="unsupported_currency",
+                translation_placeholders={"option": option},
+            )
 
         if self._is_no_op_write(value):
             LOGGER.debug(
@@ -94,9 +99,7 @@ class EcovolterCurrencySelect(OptimisticEcovolterEntity, SelectEntity):
             )
             return
 
-        await self.coordinator.config_entry.runtime_data.client.async_set_settings(
-            {"currency": value}
-        )
+        await self._async_set_settings({"currency": value})
         # Comparison is int-vs-int against get_settings()['currency'].
         self._apply_optimistic(value)
         await self.coordinator.async_request_refresh()

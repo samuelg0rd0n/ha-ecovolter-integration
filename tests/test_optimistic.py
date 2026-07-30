@@ -7,6 +7,7 @@ from datetime import timedelta
 import pytest
 
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from pytest_homeassistant_custom_component.common import (  # type: ignore[import-untyped]
     async_fire_time_changed,
 )
@@ -297,7 +298,7 @@ async def test_patch_failure_sets_no_optimistic(
 
     fake_client.async_set_settings = _boom  # type: ignore[method-assign]
 
-    with pytest.raises(EcovolterApiClientCommunicationError):
+    with pytest.raises(HomeAssistantError):
         await _turn_on(hass, sw.entity_id)
 
     assert sw._optimistic_set is False

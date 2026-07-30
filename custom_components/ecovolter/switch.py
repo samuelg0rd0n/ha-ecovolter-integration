@@ -118,9 +118,7 @@ class IntegrationEcovolterSwitch(OptimisticEcovolterEntity, SwitchEntity):
             )
             return
 
-        await self.coordinator.config_entry.runtime_data.client.async_set_settings(
-            {self.entity_description.key: value}
-        )
+        await self._async_set_settings({self.entity_description.key: value})
         self._apply_optimistic(value)
         await self.coordinator.async_request_refresh()
 

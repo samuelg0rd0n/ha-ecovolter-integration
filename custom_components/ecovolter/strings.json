@@ -25,6 +25,17 @@
       "already_configured": "This entry is already configured."
     }
   },
+  "exceptions": {
+    "write_failed": {
+      "message": "Failed to update the charger: {error}"
+    },
+    "write_auth_failed": {
+      "message": "Authentication failed while writing to the charger. Please reauthenticate."
+    },
+    "unsupported_currency": {
+      "message": "Unsupported currency option: {option}"
+    }
+  },
   "entity": {
     "sensor": {
       "charged_energy": {

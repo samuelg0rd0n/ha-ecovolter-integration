@@ -25,6 +25,17 @@
       "already_configured": "Toto zařízení je již nakonfigurováno."
     }
   },
+  "exceptions": {
+    "write_failed": {
+      "message": "Nepodařilo se aktualizovat nabíječku: {error}"
+    },
+    "write_auth_failed": {
+      "message": "Autentizace při zápisu do nabíječky selhala. Přihlaste se prosím znovu."
+    },
+    "unsupported_currency": {
+      "message": "Nepodporovaná měna: {option}"
+    }
+  },
   "entity": {
     "sensor": {
       "charged_energy": {
