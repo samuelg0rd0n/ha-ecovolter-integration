@@ -28,6 +28,7 @@ from .utils import (
 )
 
 from .const import (
+    LOGGER,
     MIN_CURRENT,
     MAX_CURRENT,
     CURRENCY_MAP,
@@ -209,6 +210,14 @@ class IntegrationEcovolterNumber(OptimisticEcovolterEntity, NumberEntity):
             value = round(float(value), 2)
         else:
             value = int(value)
+
+        if self._is_no_op_write(value):
+            LOGGER.debug(
+                "Skipping no-op write for %s: %s already in effect",
+                self.entity_id,
+                value,
+            )
+            return
 
         await self.coordinator.config_entry.runtime_data.client.async_set_settings(
             {key: value}

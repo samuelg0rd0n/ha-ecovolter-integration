@@ -85,6 +85,21 @@ class OptimisticEcovolterEntity(IntegrationEcovolterEntity):
         """
         return optimistic_raw == device_raw
 
+    def _is_no_op_write(self, requested_raw: Any) -> bool:
+        """Whether writing requested_raw would not change anything the device holds.
+
+        Compares against a pending optimistic value first (it's the
+        integration's own record of what it last sent, so freshness doesn't
+        apply to it); otherwise against the coordinator's device value, gated
+        on ``data_is_fresh`` so a value the device silently dropped is still
+        re-asserted while stale data is being served.
+        """
+        if self._optimistic_set:
+            return self._values_match(requested_raw, self._optimistic_value)
+        if not self.coordinator.data_is_fresh:
+            return False
+        return self._values_match(requested_raw, self._device_value())
+
     @callback
     def _handle_coordinator_update(self) -> None:
         """Reconcile optimistic state on every coordinator cycle.

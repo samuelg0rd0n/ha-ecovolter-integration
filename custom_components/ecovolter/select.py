@@ -10,7 +10,7 @@ from homeassistant.helpers.entity import EntityCategory
 
 from typing import Any
 
-from .const import CURRENCY_MAP, CURRENCY_INV_MAP
+from .const import CURRENCY_MAP, CURRENCY_INV_MAP, LOGGER
 from .entity import OptimisticEcovolterEntity
 from .utils import camel_to_snake, get_settings
 
@@ -85,6 +85,15 @@ class EcovolterCurrencySelect(OptimisticEcovolterEntity, SelectEntity):
         value = CURRENCY_INV_MAP.get(option)
         if value is None:
             raise ValueError(f"Unsupported currency option: {option}")
+
+        if self._is_no_op_write(value):
+            LOGGER.debug(
+                "Skipping no-op write for %s: %s already in effect",
+                self.entity_id,
+                value,
+            )
+            return
+
         await self.coordinator.config_entry.runtime_data.client.async_set_settings(
             {"currency": value}
         )
