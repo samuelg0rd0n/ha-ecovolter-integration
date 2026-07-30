@@ -11,7 +11,7 @@ from homeassistant.helpers.entity import EntityCategory
 
 from typing import Any
 
-from .const import CURRENCY_MAP, CURRENCY_INV_MAP, DOMAIN, LOGGER
+from .const import CURRENCY_MAP, CURRENCY_INV_MAP, DOMAIN
 from .entity import OptimisticEcovolterEntity
 from .utils import camel_to_snake, get_settings
 
@@ -91,15 +91,6 @@ class EcovolterCurrencySelect(OptimisticEcovolterEntity, SelectEntity):
                 translation_placeholders={"option": option},
             )
 
-        if self._is_no_op_write(value):
-            LOGGER.debug(
-                "Skipping no-op write for %s: %s already in effect",
-                self.entity_id,
-                value,
-            )
-            return
-
-        await self._async_set_settings({"currency": value})
-        # Comparison is int-vs-int against get_settings()['currency'].
-        self._apply_optimistic(value)
-        await self.coordinator.async_request_refresh()
+        # Comparison and optimistic storage are int-vs-int against
+        # get_settings()['currency'].
+        await self._async_write_setting("currency", value)

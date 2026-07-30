@@ -28,7 +28,6 @@ from .utils import (
 )
 
 from .const import (
-    LOGGER,
     MIN_CURRENT,
     MAX_CURRENT,
     CURRENCY_MAP,
@@ -211,16 +210,6 @@ class IntegrationEcovolterNumber(OptimisticEcovolterEntity, NumberEntity):
         else:
             value = int(value)
 
-        if self._is_no_op_write(value):
-            LOGGER.debug(
-                "Skipping no-op write for %s: %s already in effect",
-                self.entity_id,
-                value,
-            )
-            return
-
-        await self._async_set_settings({key: value})
-        # Store the post-clamp/round/int value actually sent — a 40 A request
-        # clamped to 32 A must show 32, never 40.
-        self._apply_optimistic(value)
-        await self.coordinator.async_request_refresh()
+        # _async_write_setting stores the post-clamp/round/int value actually
+        # sent — a 40 A request clamped to 32 A must show 32, never 40.
+        await self._async_write_setting(key, value)

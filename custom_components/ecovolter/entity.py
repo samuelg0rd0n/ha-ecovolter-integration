@@ -13,6 +13,7 @@ from .api import EcovolterApiClientAuthenticationError, EcovolterApiClientError
 from .const import (
     ATTRIBUTION,
     DOMAIN,
+    LOGGER,
     CONF_SERIAL_NUMBER,
     OPTIMISTIC_TIMEOUT_SECONDS,
 )
@@ -125,6 +126,25 @@ class OptimisticEcovolterEntity(IntegrationEcovolterEntity):
                 translation_key="write_failed",
                 translation_placeholders={"error": str(exception)},
             ) from exception
+
+    async def _async_write_setting(self, key: str, value: Any) -> None:
+        """Write a single setting, suppressing a no-op PATCH.
+
+        Consults `_is_no_op_write` on the post-transform value; on a match,
+        logs at debug and returns without sending the PATCH, applying
+        optimistic state, or requesting a refresh.
+        """
+        if self._is_no_op_write(value):
+            LOGGER.debug(
+                "Skipping no-op write for %s: %s already in effect",
+                self.entity_id,
+                value,
+            )
+            return
+
+        await self._async_set_settings({key: value})
+        self._apply_optimistic(value)
+        await self.coordinator.async_request_refresh()
 
     @callback
     def _handle_coordinator_update(self) -> None:

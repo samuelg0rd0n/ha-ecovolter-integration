@@ -12,7 +12,6 @@ from homeassistant.components.switch import (
 
 from homeassistant.helpers.entity import EntityCategory
 
-from .const import LOGGER
 from .utils import camel_to_snake, get_settings
 from .entity import OptimisticEcovolterEntity
 
@@ -103,29 +102,10 @@ class IntegrationEcovolterSwitch(OptimisticEcovolterEntity, SwitchEntity):
             return bool(self._optimistic_value)
         return self._device_value()
 
-    async def _async_write(self, value: bool) -> None:
-        """Write a bool setting, suppressing a no-op PATCH.
-
-        PATCH first; only set optimistic on success. If it raises, let it
-        propagate — HA surfaces the error and the property falls back to
-        coordinator data.
-        """
-        if self._is_no_op_write(value):
-            LOGGER.debug(
-                "Skipping no-op write for %s: %s already in effect",
-                self.entity_id,
-                value,
-            )
-            return
-
-        await self._async_set_settings({self.entity_description.key: value})
-        self._apply_optimistic(value)
-        await self.coordinator.async_request_refresh()
-
     async def async_turn_on(self, **_: Any) -> None:
         """Turn on the switch."""
-        await self._async_write(True)
+        await self._async_write_setting(self.entity_description.key, True)
 
     async def async_turn_off(self, **_: Any) -> None:
         """Turn off the switch."""
-        await self._async_write(False)
+        await self._async_write_setting(self.entity_description.key, False)
