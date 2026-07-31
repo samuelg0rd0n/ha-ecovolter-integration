@@ -6,5 +6,5 @@
   "documentation": "https://github.com/samuelg0rd0n/ha-ecovolter-integration",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/samuelg0rd0n/ha-ecovolter-integration/issues",
-  "version": "1.0.0"
+  "version": "1.0.1-beta.0"
 }
