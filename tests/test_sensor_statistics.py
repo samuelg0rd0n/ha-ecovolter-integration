@@ -8,7 +8,6 @@ docs/plans/2026-07-29-001-fix-no-op-write-suppression-plan.md (R7).
 from __future__ import annotations
 
 import pytest
-
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import UnitOfEnergy
 from homeassistant.core import HomeAssistant

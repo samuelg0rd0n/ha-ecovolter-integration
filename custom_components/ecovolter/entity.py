@@ -12,9 +12,9 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .api import EcovolterApiClientAuthenticationError, EcovolterApiClientError
 from .const import (
     ATTRIBUTION,
+    CONF_SERIAL_NUMBER,
     DOMAIN,
     LOGGER,
-    CONF_SERIAL_NUMBER,
     OPTIMISTIC_TIMEOUT_SECONDS,
 )
 from .coordinator import EcovolterDataUpdateCoordinator

@@ -6,7 +6,6 @@ from datetime import timedelta
 from types import SimpleNamespace
 
 import pytest
-
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import UpdateFailed
@@ -19,12 +18,12 @@ from custom_components.ecovolter.api import (
     EcovolterApiClientCommunicationError,
 )
 from custom_components.ecovolter.const import (
+    CONF_SECRET_KEY,
+    CONF_SERIAL_NUMBER,
+    CONF_UPDATE_INTERVAL,
     DOMAIN,
     LOGGER,
     MAX_CONSECUTIVE_FAILURES,
-    CONF_SERIAL_NUMBER,
-    CONF_SECRET_KEY,
-    CONF_UPDATE_INTERVAL,
 )
 from custom_components.ecovolter.coordinator import EcovolterDataUpdateCoordinator
 
@@ -143,6 +142,7 @@ async def test_first_refresh_failure_sets_setup_retry(
 ) -> None:
     """End-to-end: a failing first poll leaves the entry in SETUP_RETRY."""
     from unittest.mock import patch
+
     from homeassistant.config_entries import ConfigEntryState
 
     fake_client.fail_exc = EcovolterApiClientCommunicationError("timeout")

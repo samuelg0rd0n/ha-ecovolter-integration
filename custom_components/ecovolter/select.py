@@ -2,22 +2,22 @@ from __future__ import annotations
 
 from typing import (
     TYPE_CHECKING,
+    Any,
+    ClassVar,
 )
 
 from homeassistant.components.select import SelectEntity, SelectEntityDescription
 from homeassistant.exceptions import ServiceValidationError
-
 from homeassistant.helpers.entity import EntityCategory
 
-from typing import Any
-
-from .const import CURRENCY_MAP, CURRENCY_INV_MAP, DOMAIN
+from .const import CURRENCY_INV_MAP, CURRENCY_MAP, DOMAIN
 from .entity import OptimisticEcovolterEntity
 from .utils import camel_to_snake, get_settings
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
     from .coordinator import EcovolterDataUpdateCoordinator
     from .data import EcovolterConfigEntry
 
@@ -48,7 +48,7 @@ async def async_setup_entry(
 class EcovolterCurrencySelect(OptimisticEcovolterEntity, SelectEntity):
     """Currency selection."""
 
-    _options = list(CURRENCY_INV_MAP.keys())
+    _options: ClassVar[list[str]] = list(CURRENCY_INV_MAP.keys())
 
     def __init__(
         self,

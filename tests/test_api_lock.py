@@ -32,7 +32,7 @@ class RecordingSession:
         self.max_active = 0
         self.raise_timeout = False
 
-    async def request(self, method, url, headers=None, json=None) -> FakeResponse:  # noqa: A002
+    async def request(self, method, url, headers=None, json=None) -> FakeResponse:
         if self.raise_timeout:
             raise TimeoutError("forced")
         self.active += 1

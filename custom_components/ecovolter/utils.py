@@ -1,17 +1,16 @@
 import re
-
+from collections.abc import Mapping
 from typing import (
     Any,
-    Mapping,
 )
 
 from .const import (
-    KEY_STATUS,
-    KEY_SETTINGS,
+    CHARGER_TYPE_MAX_CURRENT,
     KEY_DIAGNOSTICS,
+    KEY_SETTINGS,
+    KEY_STATUS,
     KEY_TYPE_INFO,
     MAX_CURRENT,
-    CHARGER_TYPE_MAX_CURRENT,
 )
 
 

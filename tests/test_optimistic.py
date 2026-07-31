@@ -5,7 +5,6 @@ from __future__ import annotations
 from datetime import timedelta
 
 import pytest
-
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from pytest_homeassistant_custom_component.common import (  # type: ignore[import-untyped]

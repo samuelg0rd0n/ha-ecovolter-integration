@@ -10,7 +10,6 @@ import json
 from pathlib import Path
 
 import pytest
-
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import (
     ConfigEntryAuthFailed,

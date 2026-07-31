@@ -11,13 +11,13 @@ from homeassistant.loader import async_get_loaded_integration
 
 from .api import EcovolterApiClient
 from .const import (
-    DOMAIN,
-    LOGGER,
+    CONF_BASE_URI,
     CONF_SECRET_KEY,
     CONF_SERIAL_NUMBER,
-    CONF_BASE_URI,
     CONF_UPDATE_INTERVAL,
     DEFAULT_UPDATE_INTERVAL_SECONDS,
+    DOMAIN,
+    LOGGER,
     MIN_UPDATE_INTERVAL_SECONDS,
 )
 from .coordinator import EcovolterDataUpdateCoordinator
@@ -26,6 +26,7 @@ from .utils import as_int
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
+
     from .data import EcovolterConfigEntry
 
 PLATFORMS: list[Platform] = [

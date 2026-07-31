@@ -5,15 +5,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from homeassistant.components.switch import (
+    SwitchDeviceClass,
     SwitchEntity,
     SwitchEntityDescription,
-    SwitchDeviceClass,
 )
-
 from homeassistant.helpers.entity import EntityCategory
 
-from .utils import camel_to_snake, get_settings
 from .entity import OptimisticEcovolterEntity
+from .utils import camel_to_snake, get_settings
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant

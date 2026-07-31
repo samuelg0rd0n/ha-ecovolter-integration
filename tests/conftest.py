@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 from typing import Any
-
-import pytest
 from unittest.mock import patch
 
+import pytest
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_component import DATA_INSTANCES
 from pytest_homeassistant_custom_component.common import (  # type: ignore[import-untyped]
@@ -12,10 +11,10 @@ from pytest_homeassistant_custom_component.common import (  # type: ignore[impor
 )
 
 from custom_components.ecovolter.const import (
-    DOMAIN,
-    CONF_SERIAL_NUMBER,
     CONF_SECRET_KEY,
+    CONF_SERIAL_NUMBER,
     CONF_UPDATE_INTERVAL,
+    DOMAIN,
 )
 
 

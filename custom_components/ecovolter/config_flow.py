@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 import voluptuous as vol
-
 from homeassistant import config_entries
 from homeassistant.helpers import selector
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
@@ -16,18 +15,16 @@ from .api import (
     EcovolterApiClientCommunicationError,
     EcovolterApiClientError,
 )
-
 from .const import (
-    DOMAIN,
-    LOGGER,
+    CONF_BASE_URI,
     CONF_SECRET_KEY,
     CONF_SERIAL_NUMBER,
-    CONF_BASE_URI,
     CONF_UPDATE_INTERVAL,
     DEFAULT_UPDATE_INTERVAL_SECONDS,
+    DOMAIN,
+    LOGGER,
     MIN_UPDATE_INTERVAL_SECONDS,
 )
-
 from .utils import as_int
 
 
@@ -56,8 +53,7 @@ class EcovolterFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             # Update interval (optional)
             raw = user_input.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL_SECONDS)
             interval = as_int(raw) or DEFAULT_UPDATE_INTERVAL_SECONDS
-            if interval < MIN_UPDATE_INTERVAL_SECONDS:
-                interval = MIN_UPDATE_INTERVAL_SECONDS
+            interval = max(interval, MIN_UPDATE_INTERVAL_SECONDS)
 
             # Validate credentials by calling API
             try:
