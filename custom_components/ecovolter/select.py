@@ -2,21 +2,22 @@ from __future__ import annotations
 
 from typing import (
     TYPE_CHECKING,
+    Any,
+    ClassVar,
 )
 
 from homeassistant.components.select import SelectEntity, SelectEntityDescription
-
+from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers.entity import EntityCategory
 
-from typing import Any
-
-from .const import CURRENCY_MAP, CURRENCY_INV_MAP
+from .const import CURRENCY_INV_MAP, CURRENCY_MAP, DOMAIN
 from .entity import OptimisticEcovolterEntity
 from .utils import camel_to_snake, get_settings
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
     from .coordinator import EcovolterDataUpdateCoordinator
     from .data import EcovolterConfigEntry
 
@@ -47,7 +48,7 @@ async def async_setup_entry(
 class EcovolterCurrencySelect(OptimisticEcovolterEntity, SelectEntity):
     """Currency selection."""
 
-    _options = list(CURRENCY_INV_MAP.keys())
+    _options: ClassVar[list[str]] = list(CURRENCY_INV_MAP.keys())
 
     def __init__(
         self,
@@ -84,10 +85,12 @@ class EcovolterCurrencySelect(OptimisticEcovolterEntity, SelectEntity):
         """Map ISO code → device int and write."""
         value = CURRENCY_INV_MAP.get(option)
         if value is None:
-            raise ValueError(f"Unsupported currency option: {option}")
-        await self.coordinator.config_entry.runtime_data.client.async_set_settings(
-            {"currency": value}
-        )
-        # Comparison is int-vs-int against get_settings()['currency'].
-        self._apply_optimistic(value)
-        await self.coordinator.async_request_refresh()
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="unsupported_currency",
+                translation_placeholders={"option": option},
+            )
+
+        # Comparison and optimistic storage are int-vs-int against
+        # get_settings()['currency'].
+        await self._async_write_setting("currency", value)

@@ -1,28 +1,29 @@
 from __future__ import annotations
 
-import pytest
 from unittest.mock import AsyncMock, patch
 
-from homeassistant.core import HomeAssistant
+import pytest
 from homeassistant import config_entries
+from homeassistant.core import HomeAssistant
+from homeassistant.data_entry_flow import FlowResultType
 
-# Adjust if your import paths differ
-from custom_components.ecovolter.const import (
-    DOMAIN,
-    CONF_SERIAL_NUMBER,
-    CONF_SECRET_KEY,
-    CONF_BASE_URI,
-    CONF_UPDATE_INTERVAL,
-    MIN_UPDATE_INTERVAL_SECONDS,
-    DEFAULT_UPDATE_INTERVAL_SECONDS,
-)
 from custom_components.ecovolter.api import (
     EcovolterApiClientAuthenticationError,
     EcovolterApiClientCommunicationError,
     EcovolterApiClientError,
 )
 
-from homeassistant.data_entry_flow import FlowResultType
+# Adjust if your import paths differ
+from custom_components.ecovolter.const import (
+    CONF_BASE_URI,
+    CONF_SECRET_KEY,
+    CONF_SERIAL_NUMBER,
+    CONF_UPDATE_INTERVAL,
+    DEFAULT_UPDATE_INTERVAL_SECONDS,
+    DOMAIN,
+    MIN_UPDATE_INTERVAL_SECONDS,
+)
+
 
 @pytest.fixture(name="ecovolter_setup", autouse=True)
 def ecovolter_setup_fixture():

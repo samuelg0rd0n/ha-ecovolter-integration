@@ -5,15 +5,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from homeassistant.components.switch import (
+    SwitchDeviceClass,
     SwitchEntity,
     SwitchEntityDescription,
-    SwitchDeviceClass,
 )
-
 from homeassistant.helpers.entity import EntityCategory
 
-from .utils import camel_to_snake, get_settings
 from .entity import OptimisticEcovolterEntity
+from .utils import camel_to_snake, get_settings
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -104,19 +103,8 @@ class IntegrationEcovolterSwitch(OptimisticEcovolterEntity, SwitchEntity):
 
     async def async_turn_on(self, **_: Any) -> None:
         """Turn on the switch."""
-        # PATCH first; only set optimistic on success. If it raises, let it
-        # propagate — HA surfaces the error and the property falls back to
-        # coordinator data.
-        await self.coordinator.config_entry.runtime_data.client.async_set_settings(
-            {self.entity_description.key: True}
-        )
-        self._apply_optimistic(True)
-        await self.coordinator.async_request_refresh()
+        await self._async_write_setting(self.entity_description.key, True)
 
     async def async_turn_off(self, **_: Any) -> None:
         """Turn off the switch."""
-        await self.coordinator.config_entry.runtime_data.client.async_set_settings(
-            {self.entity_description.key: False}
-        )
-        self._apply_optimistic(False)
-        await self.coordinator.async_request_refresh()
+        await self._async_write_setting(self.entity_description.key, False)

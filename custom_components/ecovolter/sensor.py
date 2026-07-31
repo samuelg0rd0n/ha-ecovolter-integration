@@ -10,33 +10,30 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
-
 from homeassistant.const import (
-    UnitOfTime,
-    UnitOfEnergy,
-    UnitOfPower,
     UnitOfElectricCurrent,
     UnitOfElectricPotential,
+    UnitOfEnergy,
+    UnitOfPower,
     UnitOfTemperature,
+    UnitOfTime,
 )
-
 from homeassistant.helpers.entity import EntityCategory
 
-from .utils import (
-    camel_to_snake,
-    as_float,
-    get_status,
-    get_settings,
-    get_diagnostics,
-    get_type_info,
-    extract_temperature,
-)
 from .const import (
-    CURRENCY_MAP,
     CHARGER_TYPE_LABELS,
+    CURRENCY_MAP,
 )
-
 from .entity import IntegrationEcovolterEntity
+from .utils import (
+    as_float,
+    camel_to_snake,
+    extract_temperature,
+    get_diagnostics,
+    get_settings,
+    get_status,
+    get_type_info,
+)
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -234,7 +231,7 @@ ENTITY_DESCRIPTIONS = (
         translation_key="total_charged_energy",
         icon="mdi:lightning-bolt-circle",
         device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL_INCREASING,
+        state_class=SensorStateClass.TOTAL,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         suggested_display_precision=3,
     ),

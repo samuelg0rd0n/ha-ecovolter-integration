@@ -4,36 +4,31 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, cast
 
-
 from homeassistant.components.number import (
+    NumberDeviceClass,
     NumberEntity,
     NumberEntityDescription,
-    NumberDeviceClass,
 )
-
 from homeassistant.const import (
     UnitOfElectricCurrent,
-    UnitOfTime,
     UnitOfEnergy,
+    UnitOfTime,
 )
-
 from homeassistant.helpers.entity import EntityCategory
 
-from .utils import (
-    camel_to_snake,
-    get_settings,
-    get_charger_type_maximum_charging_current,
-    clamp_int,
-    as_float,
-)
-
 from .const import (
-    MIN_CURRENT,
-    MAX_CURRENT,
     CURRENCY_MAP,
+    MAX_CURRENT,
+    MIN_CURRENT,
 )
-
 from .entity import OptimisticEcovolterEntity
+from .utils import (
+    as_float,
+    camel_to_snake,
+    clamp_int,
+    get_charger_type_maximum_charging_current,
+    get_settings,
+)
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -210,10 +205,6 @@ class IntegrationEcovolterNumber(OptimisticEcovolterEntity, NumberEntity):
         else:
             value = int(value)
 
-        await self.coordinator.config_entry.runtime_data.client.async_set_settings(
-            {key: value}
-        )
-        # Store the post-clamp/round/int value actually sent — a 40 A request
-        # clamped to 32 A must show 32, never 40.
-        self._apply_optimistic(value)
-        await self.coordinator.async_request_refresh()
+        # _async_write_setting stores the post-clamp/round/int value actually
+        # sent — a 40 A request clamped to 32 A must show 32, never 40.
+        await self._async_write_setting(key, value)

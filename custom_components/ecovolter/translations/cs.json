@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Přidat nabíječku EcoVolter",
-        "description": "Sériové číslo nabíječky lze najít přímo na nabíječce, popřípadě v aplikaci EV-Manager (iOS/Android). Tajný klíč je ve výchozím stavu stejný jako Sériové číslo. Pro pomoc s nastavením : https://github.com/samuelg0rd0n/ha-ecovolter-integration",
+        "description": "Sériové číslo nabíječky lze najít přímo na nabíječce, popřípadě v aplikaci EV-Manager (iOS/Android). Tajný klíč je ve výchozím stavu stejný jako Sériové číslo.",
         "data": {
           "serial_number": "Sériové číslo nabíječky",
           "secret_key": "Tajný klíč",
@@ -23,6 +23,17 @@
     },
     "abort": {
       "already_configured": "Toto zařízení je již nakonfigurováno."
+    }
+  },
+  "exceptions": {
+    "write_failed": {
+      "message": "Nepodařilo se aktualizovat nabíječku: {error}"
+    },
+    "write_auth_failed": {
+      "message": "Autentizace při zápisu do nabíječky selhala. Přihlaste se prosím znovu."
+    },
+    "unsupported_currency": {
+      "message": "Nepodporovaná měna: {option}"
     }
   },
   "entity": {

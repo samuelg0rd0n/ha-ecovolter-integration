@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Add EcoVolter Charger",
-        "description": "Charger Serial Number can be found on the charger itself or in EV-Manager (iOS/Android app). Secret Key is by default the same value as Charger Serial Number. If you need help with the configuration have a look here: https://github.com/samuelg0rd0n/ha-ecovolter-integration",
+        "description": "Charger Serial Number can be found on the charger itself or in EV-Manager (iOS/Android app). Secret Key is by default the same value as Charger Serial Number.",
         "data": {
           "serial_number": "Charger serial number",
           "secret_key": "Secret key",
@@ -23,6 +23,17 @@
     },
     "abort": {
       "already_configured": "This entry is already configured."
+    }
+  },
+  "exceptions": {
+    "write_failed": {
+      "message": "Failed to update the charger: {error}"
+    },
+    "write_auth_failed": {
+      "message": "Authentication failed while writing to the charger. Please reauthenticate."
+    },
+    "unsupported_currency": {
+      "message": "Unsupported currency option: {option}"
     }
   },
   "entity": {

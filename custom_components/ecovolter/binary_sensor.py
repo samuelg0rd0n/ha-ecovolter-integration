@@ -10,8 +10,8 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 
-from .utils import camel_to_snake, get_status
 from .entity import IntegrationEcovolterEntity
+from .utils import camel_to_snake, get_status
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant

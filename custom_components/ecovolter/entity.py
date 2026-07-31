@@ -5,13 +5,16 @@ from __future__ import annotations
 from typing import Any
 
 from homeassistant.core import callback
+from homeassistant.exceptions import ConfigEntryAuthFailed, HomeAssistantError
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
+from .api import EcovolterApiClientAuthenticationError, EcovolterApiClientError
 from .const import (
     ATTRIBUTION,
-    DOMAIN,
     CONF_SERIAL_NUMBER,
+    DOMAIN,
+    LOGGER,
     OPTIMISTIC_TIMEOUT_SECONDS,
 )
 from .coordinator import EcovolterDataUpdateCoordinator
@@ -84,6 +87,64 @@ class OptimisticEcovolterEntity(IntegrationEcovolterEntity):
         to survive float round-trip drift.
         """
         return optimistic_raw == device_raw
+
+    def _is_no_op_write(self, requested_raw: Any) -> bool:
+        """Whether writing requested_raw would not change anything the device holds.
+
+        Compares against a pending optimistic value first (it's the
+        integration's own record of what it last sent, so freshness doesn't
+        apply to it); otherwise against the coordinator's device value, gated
+        on ``data_is_fresh`` so a value the device silently dropped is still
+        re-asserted while stale data is being served.
+        """
+        if self._optimistic_set:
+            return self._values_match(requested_raw, self._optimistic_value)
+        if not self.coordinator.data_is_fresh:
+            return False
+        return self._values_match(requested_raw, self._device_value())
+
+    async def _async_set_settings(self, data: dict[str, Any]) -> None:
+        """PATCH settings, translating client errors into HA error types.
+
+        Both ``ConfigEntryAuthFailed`` and ``HomeAssistantError`` log as a
+        single categorized line and honor ``continue_on_error``;
+        ``ConfigEntryAuthFailed`` additionally starts reauthentication. The
+        original client error is chained so it still surfaces in debug logs.
+        """
+        try:
+            await self.coordinator.config_entry.runtime_data.client.async_set_settings(
+                data
+            )
+        except EcovolterApiClientAuthenticationError as exception:
+            raise ConfigEntryAuthFailed(
+                translation_domain=DOMAIN,
+                translation_key="write_auth_failed",
+            ) from exception
+        except EcovolterApiClientError as exception:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="write_failed",
+                translation_placeholders={"error": str(exception)},
+            ) from exception
+
+    async def _async_write_setting(self, key: str, value: Any) -> None:
+        """Write a single setting, suppressing a no-op PATCH.
+
+        Consults `_is_no_op_write` on the post-transform value; on a match,
+        logs at debug and returns without sending the PATCH, applying
+        optimistic state, or requesting a refresh.
+        """
+        if self._is_no_op_write(value):
+            LOGGER.debug(
+                "Skipping no-op write for %s: %s already in effect",
+                self.entity_id,
+                value,
+            )
+            return
+
+        await self._async_set_settings({key: value})
+        self._apply_optimistic(value)
+        await self.coordinator.async_request_refresh()
 
     @callback
     def _handle_coordinator_update(self) -> None:

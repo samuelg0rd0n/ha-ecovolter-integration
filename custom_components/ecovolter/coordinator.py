@@ -15,11 +15,10 @@ from .api import (
     EcovolterApiClientAuthenticationError,
     EcovolterApiClientError,
 )
-
 from .const import (
-    KEY_STATUS,
-    KEY_SETTINGS,
     KEY_DIAGNOSTICS,
+    KEY_SETTINGS,
+    KEY_STATUS,
     KEY_TYPE_INFO,
     LOGGER,
     MAX_CONSECUTIVE_FAILURES,
