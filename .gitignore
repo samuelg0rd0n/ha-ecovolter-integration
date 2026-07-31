@@ -1,22 +1,16 @@
-# Ignore everything
-*
+# Python
+__pycache__/
+*.pyc
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
 
-# But not these files...
-!.gitignore
-!README.md
-!LICENSE
-!hacs.json
-!CONCEPTS.md
-!docs/
-!docs/**
+# OS
+.DS_Store
 
-# And not the custom_components folder and its contents
-!custom_components/
-!custom_components/**
-custom_components/ecovolter/__pycache__
+# Claude Code local runtime state (skills/scripts under .claude/ are tracked)
+.claude/scheduled_tasks.lock
 
-# And not the test suite
-!tests/
-!tests/**
-tests/__pycache__/
-**/__pycache__/
+# Personal local tooling, not part of the distributed integration
+watch_charging.py
